@@ -1,7 +1,9 @@
 import { render } from 'solid-js/web'
-import { Nav } from './App/Nav'
+import { Nav } from './App/Nav/Nav'
 import { Pages } from './App/Pages/Pages'
 import { Router } from '@solidjs/router'
+
+import './index.scss'
 
 const root = document.getElementById('app') as HTMLElement
 
