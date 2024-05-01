@@ -1,6 +1,6 @@
-const NAV={
+const NAV = {
     HOME: 'HOME',
-    LOGIN: 'LOGIN',
+    LOGIN: 'LOGIN'
 }
 
 export default NAV

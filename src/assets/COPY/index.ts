@@ -1,9 +1,9 @@
 import NAV from './NAV'
 import ROUTE from './ROUTE'
 
-const COPY={
+const COPY = {
     ROUTE: ROUTE,
-    NAV: NAV,
+    NAV: NAV
 }
 
 export default COPY
