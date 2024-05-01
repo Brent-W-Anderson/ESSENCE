@@ -1,0 +1,23 @@
+{
+    "name": "solid-vite-boilerplate",
+    "type": "module",
+    "packageManager": "yarn@4.1.1",
+    "scripts": {
+        "setup": "yarn dlx @yarnpkg/sdks vscode",
+        "start": "concurrently \"yarn vite\" \"yarn generate:scss-types\"",
+        "build": "vite build",
+        "generate:scss-types": "typed-scss-modules src --exportType default --nameFormat none -w"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2",
+        "typed-scss-modules": "^8.0.1",
+        "vite-plugin-html": "^3.2.2",
+        "vite-plugin-solid": "^2.10.2"
+    },
+    "dependencies": {
+        "@solidjs/router": "^0.13.2",
+        "solid-js": "^1.8.16",
+        "typescript": "^5.4.5",
+        "vite": "^5.2.8"
+    }
+}
