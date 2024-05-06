@@ -4,7 +4,9 @@ import { Nav } from './App/Nav/Nav'
 import { Pages } from './App/Pages/Pages'
 import './index.scss'
 
-const root = document.getElementById('app') as HTMLElement
+const root = document.createElement('div')
+root.id = 'app'
+document.body.appendChild(root)
 
 const App = () => (
     <Router root={Nav}>
