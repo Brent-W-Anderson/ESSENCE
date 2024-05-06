@@ -13,7 +13,7 @@ const Floor: Component<FloorProps> = ({ scene, onFloorCreated }) => {
     onMount(() => {
         const floorGeometry = new THREE.PlaneGeometry(40, 40)
         const floorMaterial = new THREE.MeshStandardMaterial({
-            color: 0x808080
+            color: 0xcccccc
         })
         floor = new THREE.Mesh(floorGeometry, floorMaterial)
 

@@ -18,7 +18,7 @@ const HomePage: Component = () => {
     )
 
     scene.background = new THREE.Color(0xffffff)
-    camera.position.set(0, 2, 5)
+    camera.position.set(5, 10, 5)
 
     const [cubeRef, setCubeRef] = createSignal<THREE.Object3D | null>(null)
     const [floorRef, setFloorRef] = createSignal<THREE.Object3D | null>(null)
@@ -53,6 +53,7 @@ const HomePage: Component = () => {
                 <Cube scene={scene} onCubeCreated={setCubeRef} />
                 <Floor scene={scene} onFloorCreated={setFloorRef} />
                 <PlayerMovement
+                    scene={scene}
                     camera={camera}
                     cubeRef={cubeRef}
                     floorRef={floorRef}

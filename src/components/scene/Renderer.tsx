@@ -13,8 +13,10 @@ const Renderer: Component<RendererProps> = ({
     scene,
     camera,
     renderer
-}) => {
+}) => {    
     createEffect(() => {
+        renderer.shadowMap.enabled = true
+
         const animate = () => {
             requestAnimationFrame(animate)
             renderer.render(scene, camera)

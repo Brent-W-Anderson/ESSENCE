@@ -1,17 +1,20 @@
-import { Component, createEffect, createSignal, onCleanup } from 'solid-js'
+import { Component, createEffect, createSignal } from 'solid-js'
 import * as THREE from 'three'
+import PlayerMovementPointer from './PlayerMovementPointer'
 
 interface PlayerMovementProps {
+  scene: THREE.Scene
   camera: THREE.PerspectiveCamera
   cubeRef: () => THREE.Object3D | null
   floorRef: () => THREE.Object3D | null
 }
 
-const PlayerMovement: Component<PlayerMovementProps> = ({ camera, cubeRef, floorRef }) => {
+const PlayerMovement: Component<PlayerMovementProps> = ({ scene, camera, cubeRef, floorRef }) => {
   let targetPos = new THREE.Vector3()
   const [mouse, setMouse] = createSignal(new THREE.Vector2(0, 0))
   let isMouseDown = false
   let intervalId: number | null = null
+  let pointer: THREE.Object3D | null = null
 
   const updateMousePosition = (event: MouseEvent) => {
     setMouse(new THREE.Vector2(
@@ -28,6 +31,10 @@ const PlayerMovement: Component<PlayerMovementProps> = ({ camera, cubeRef, floor
     const intersects = raycaster.intersectObjects([floorRef()!])
     if (intersects.length > 0) {
       targetPos = intersects[0].point
+      if (pointer) {
+        pointer.position.set(targetPos.x, 0, targetPos.z)
+        pointer.visible = true
+      }
     }
   }
 
@@ -75,6 +82,10 @@ const PlayerMovement: Component<PlayerMovementProps> = ({ camera, cubeRef, floor
         cube.quaternion.slerp(targetQuaternion, rotationSpeed)
         cube.position.add(step)
         camera.position.add(step)
+      } else {
+        if (pointer) {
+          pointer.visible = false
+        }
       }
     }
 
@@ -88,7 +99,7 @@ const PlayerMovement: Component<PlayerMovementProps> = ({ camera, cubeRef, floor
 
     animateCube()
 
-    onCleanup(() => {
+    return () => {
       document.removeEventListener('mousedown', onMouseDown)
       document.removeEventListener('mouseup', onMouseUp)
       document.removeEventListener('mousemove', updateMousePosition)
@@ -96,10 +107,12 @@ const PlayerMovement: Component<PlayerMovementProps> = ({ camera, cubeRef, floor
       if (intervalId !== null) {
         clearInterval(intervalId)
       }
-    })
+    }
   })
 
-  return null
+  return (
+    <PlayerMovementPointer scene={scene} onPointerCreated={obj => pointer = obj} />
+  )
 }
 
 export default PlayerMovement
