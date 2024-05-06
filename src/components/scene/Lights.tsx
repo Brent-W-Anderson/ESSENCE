@@ -10,7 +10,7 @@ const Lights: Component<LightsProps> = ({ scene }) => {
 
     const updateLightPosition = (time: number) => {
         const radius = 100
-        const speed = 1 / 10000
+        const speed = 1 / 100000
         const angle = time * speed
 
         const x = radius * Math.cos(angle)

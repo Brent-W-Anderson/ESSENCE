@@ -13,7 +13,7 @@ const PlayerCamera: Component<PlayerCameraProps> = ({ scene, camera, renderer, t
     const controls = new OrbitControls(camera, renderer.domElement)
 
     // Default to no rotation
-    controls.enableRotate = false
+    controls.enableRotate = true
 
     // Limit controls to prevent panning
     controls.enablePan = false
@@ -29,19 +29,11 @@ const PlayerCamera: Component<PlayerCameraProps> = ({ scene, camera, renderer, t
     controls.maxDistance = 10
     controls.rotateSpeed = 0.5
     controls.target.copy(target.position)
+    controls.mouseButtons = {
+        LEFT: null,
+        RIGHT: THREE.MOUSE.ROTATE
+    }
     controls.update()
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === 'Control') {
-            controls.enableRotate = true
-        }
-    }
-
-    const handleKeyUp = (event: KeyboardEvent) => {
-        if (event.key === 'Control') {
-            controls.enableRotate = false
-        }
-    }
 
     const animate = () => {
         controls.target.copy(target.position)
@@ -52,14 +44,10 @@ const PlayerCamera: Component<PlayerCameraProps> = ({ scene, camera, renderer, t
     createEffect(() => {
         scene.add(camera)
         animate()
-        window.addEventListener('keydown', handleKeyDown)
-        window.addEventListener('keyup', handleKeyUp)
 
         return () => {
             scene.remove(camera)
             controls.dispose()
-            window.removeEventListener('keydown', handleKeyDown)
-            window.removeEventListener('keyup', handleKeyUp)
         }
     })
 
