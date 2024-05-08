@@ -6,11 +6,12 @@ import Lights from '../../../components/scene/Lights'
 import PlayerCamera from '../../../components/scene/PlayerCamera'
 import PlayerMovement from '../../../components/scene/PlayerMovement'
 import Renderer from '../../../components/scene/Renderer'
+import * as Ammo from 'ammojs3'
 
 const HomePage: Component = () => {
-    const [cubeRef, setCubeRef] = createSignal<any>()
-    const [test, setTest] = createSignal<any>()
-    const [floorRef, setFloorRef] = createSignal<THREE.Object3D>()
+    const [rigidPlayerRef, setRigidPlayerRef] = createSignal<Ammo.default.btRigidBody>()
+    const [playerRef, setPlayerRef] = createSignal<THREE.Group | THREE.Mesh>()
+    const [floorRef, setFloorRef] = createSignal<THREE.Mesh>()
 
     return (
         <>
@@ -18,13 +19,13 @@ const HomePage: Component = () => {
             <Renderer>
                 <Lights />
 
-                <Cube onCubeCreated={setCubeRef} setTest={setTest} useGravity />
+                <Cube setPlayerRef={setPlayerRef} setRigidPlayerRef={setRigidPlayerRef} useGravity />
                 <Floor onFloorCreated={setFloorRef} />
-                {cubeRef() && test() && floorRef() && (
+                {playerRef() && rigidPlayerRef() && floorRef() && (
                     <>
-                        <PlayerCamera target={test()!} />
+                        <PlayerCamera playerRef={playerRef()!} />
                         <PlayerMovement
-                            cubeRef={cubeRef()!}
+                            rigidPlayerRef={rigidPlayerRef()!}
                             floorRef={floorRef()!}
                         />
                     </>

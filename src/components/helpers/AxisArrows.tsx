@@ -2,7 +2,7 @@ import { Component } from 'solid-js'
 import * as THREE from 'three'
 
 type AxisArrowsProps = {
-    parent: THREE.Object3D
+    parent: THREE.Group | THREE.Mesh
 }
 
 const AxisArrows: Component<AxisArrowsProps> = ({ parent }) => {

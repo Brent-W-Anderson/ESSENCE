@@ -3,16 +3,17 @@ import * as THREE from 'three'
 import AxisArrows from '../helpers/AxisArrows'
 import positionController from '../helpers/PositionController'
 import { useSceneContext } from '../scene/SceneContext'
+import * as Ammo from 'ammojs3'
 
 type CubeProps = {
-    onCubeCreated: any
-    setTest: any
+    setPlayerRef: (cube: THREE.Group | THREE.Mesh) => void
+    setRigidPlayerRef: (rigidBody: Ammo.default.btRigidBody) => void
     useGravity?: boolean
 }
 
 const Cube: Component<CubeProps> = ({
-    onCubeCreated,
-    setTest,
+    setPlayerRef,
+    setRigidPlayerRef,
     useGravity = false
 }) => {
     const context = useSceneContext()
@@ -33,25 +34,25 @@ const Cube: Component<CubeProps> = ({
         scene.add(group)
         positionController.addObject('cube', group)
 
-        const rigid = createRigidBody(cube, 10, {
+        const rigidBody = createRigidBody(cube, 10, {
             width: 1,
             height: 1,
             depth: 1
         })
         if (useGravity) {
-            rigid && physicsWorld && physicsWorld()?.addRigidBody(rigid)
-            updateMesh(group, rigid)
+            rigidBody && physicsWorld && physicsWorld()?.addRigidBody(rigidBody)
+            updateMesh(group, rigidBody)
         }
 
-        onCubeCreated(rigid)
-        setTest(group)
+        setRigidPlayerRef(rigidBody)
+        setPlayerRef(group)
 
         return () => {
             scene.remove(group)
-            rigid &&
+            rigidBody &&
                 physicsWorld &&
                 useGravity &&
-                physicsWorld()?.removeRigidBody(rigid)
+                physicsWorld()?.removeRigidBody(rigidBody)
             positionController.removeObject('cube')
         }
     })

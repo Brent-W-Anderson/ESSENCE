@@ -4,10 +4,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { useSceneContext } from './SceneContext'
 
 type PlayerCameraProps = {
-    target: any
+    playerRef: THREE.Group | THREE.Mesh
 }
 
-const PlayerCamera: Component<PlayerCameraProps> = ({ target }) => {
+const PlayerCamera: Component<PlayerCameraProps> = ({ playerRef }) => {
     const context = useSceneContext()
     if (!context) return
 
@@ -30,7 +30,7 @@ const PlayerCamera: Component<PlayerCameraProps> = ({ target }) => {
     controls.minDistance = 3
     controls.maxDistance = 10
     controls.rotateSpeed = 0.5
-    controls.target.copy(target.position)
+    controls.target.copy(playerRef.position)
     controls.mouseButtons = {
         LEFT: null,
         RIGHT: THREE.MOUSE.ROTATE
@@ -38,7 +38,7 @@ const PlayerCamera: Component<PlayerCameraProps> = ({ target }) => {
     controls.update()
 
     const animate = () => {
-        controls.target.copy(target.position)
+        controls.target.copy(playerRef.position)
         controls.update()
         requestAnimationFrame(animate)
     }

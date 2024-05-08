@@ -2,14 +2,15 @@ import { Component, createEffect, createSignal } from 'solid-js'
 import * as THREE from 'three'
 import PlayerMovementPointer from './PlayerMovementPointer'
 import { useSceneContext } from './SceneContext'
+import * as Ammo from 'ammojs3'
 
 interface PlayerMovementProps {
-    cubeRef: any
+    rigidPlayerRef: Ammo.default.btRigidBody
     floorRef: THREE.Object3D
 }
 
 const PlayerMovement: Component<PlayerMovementProps> = ({
-    cubeRef,
+    rigidPlayerRef,
     floorRef
 }) => {
     const context = useSceneContext()
@@ -63,10 +64,9 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
 
     const animateCube = () => {
         const ammo = context.AmmoLib()
-        const rigidBody = cubeRef
 
         const transform = new ammo.btTransform()
-        rigidBody.getMotionState().getWorldTransform(transform)
+        rigidPlayerRef.getMotionState().getWorldTransform(transform)
         const origin = transform.getOrigin()
         const currentPosition = new THREE.Vector3(
             origin.x(),
@@ -94,8 +94,8 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
                 0,
                 directionToTarget.z * forceMagnitude
             )
-            rigidBody.activate()
-            rigidBody.setLinearVelocity(translationalForce)
+            rigidPlayerRef.activate()
+            rigidPlayerRef.setLinearVelocity(translationalForce)
             ammo.destroy(translationalForce)
         } else {
             if (pointer) {

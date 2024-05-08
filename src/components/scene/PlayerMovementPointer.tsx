@@ -3,7 +3,7 @@ import * as THREE from 'three'
 
 interface PointerProps {
     scene: THREE.Scene
-    onPointerCreated: (object: THREE.Object3D) => void
+    onPointerCreated: (object: THREE.Mesh) => void
 }
 
 const PlayerMovementPointer: Component<PointerProps> = ({
