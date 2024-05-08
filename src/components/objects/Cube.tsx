@@ -5,11 +5,16 @@ import positionController from '../helpers/PositionController'
 import { useSceneContext } from '../scene/SceneContext'
 
 type CubeProps = {
-    onCubeCreated: (cube: THREE.Group) => void
+    onCubeCreated: any
+    setTest: any
     useGravity?: boolean
 }
 
-const Cube: Component<CubeProps> = ({ onCubeCreated, useGravity = false }) => {
+const Cube: Component<CubeProps> = ({
+    onCubeCreated,
+    setTest,
+    useGravity = false
+}) => {
     const context = useSceneContext()
     if (!context) return
 
@@ -17,7 +22,7 @@ const Cube: Component<CubeProps> = ({ onCubeCreated, useGravity = false }) => {
     const group = new THREE.Group()
 
     onMount(() => {
-        const geometry = new THREE.BoxGeometry(1, 1, 1)
+        const geometry = new THREE.SphereGeometry(1, 20, 20)
         const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
         const cube = new THREE.Mesh(geometry, material)
 
@@ -28,13 +33,18 @@ const Cube: Component<CubeProps> = ({ onCubeCreated, useGravity = false }) => {
         scene.add(group)
         positionController.addObject('cube', group)
 
-        const rigid = createRigidBody(group, 0.01)
+        const rigid = createRigidBody(cube, 10, {
+            width: 1,
+            height: 1,
+            depth: 1
+        })
         if (useGravity) {
             rigid && physicsWorld && physicsWorld()?.addRigidBody(rigid)
             updateMesh(group, rigid)
         }
 
-        onCubeCreated(group)
+        onCubeCreated(rigid)
+        setTest(group)
 
         return () => {
             scene.remove(group)

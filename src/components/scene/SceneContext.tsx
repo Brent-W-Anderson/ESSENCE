@@ -15,8 +15,13 @@ interface SceneContextType {
     camera: THREE.PerspectiveCamera
     renderer: THREE.WebGLRenderer
     updateMesh: (mesh: THREE.Group | THREE.Mesh, rigidBody: any) => void
-    createRigidBody: (mesh: THREE.Group | THREE.Mesh, mass: number) => any
+    createRigidBody: (
+        mesh: THREE.Group | THREE.Mesh,
+        mass: number,
+        size: { width: number; height: number; depth: number }
+    ) => any
     physicsWorld?: Accessor<Ammo.default.btDiscreteDynamicsWorld | undefined>
+    AmmoLib: Accessor<any>
 }
 
 const SceneContext = createContext<SceneContextType>()
@@ -50,11 +55,17 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
         renderer.render(scene, camera)
     }
 
-    const createRigidBody = (mesh: THREE.Group | THREE.Mesh, mass: number) => {
+    const createRigidBody = (
+        mesh: THREE.Group | THREE.Mesh,
+        mass: number,
+        size: { width: number; height: number; depth: number }
+    ) => {
         const ammo = AmmoLib()
 
         if (ammo) {
-            const shape = new ammo.btBoxShape(new ammo.btVector3(0.5, 0, 0.5))
+            const shape = new ammo.btBoxShape(
+                new ammo.btVector3(size.width, size.height, size.depth)
+            )
             shape.setMargin(0)
 
             const transform = new ammo.btTransform()
@@ -85,8 +96,9 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
                 shape,
                 localInertia
             )
+            const body = new ammo.btRigidBody(rbInfo)
 
-            return new ammo.btRigidBody(rbInfo)
+            return body
         }
     }
 
@@ -168,7 +180,8 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
         renderer,
         physicsWorld,
         createRigidBody,
-        updateMesh
+        updateMesh,
+        AmmoLib
     }
 
     return (

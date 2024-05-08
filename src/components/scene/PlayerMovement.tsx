@@ -4,7 +4,7 @@ import PlayerMovementPointer from './PlayerMovementPointer'
 import { useSceneContext } from './SceneContext'
 
 interface PlayerMovementProps {
-    cubeRef: THREE.Object3D
+    cubeRef: any
     floorRef: THREE.Object3D
 }
 
@@ -62,33 +62,48 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
     }
 
     const animateCube = () => {
-        const direction = new THREE.Vector3(
-            targetPos.x - cubeRef.position.x,
+        const ammo = context.AmmoLib()
+        const rigidBody = cubeRef
+
+        const transform = new ammo.btTransform()
+        rigidBody.getMotionState().getWorldTransform(transform)
+        const origin = transform.getOrigin()
+        const currentPosition = new THREE.Vector3(
+            origin.x(),
+            origin.y(),
+            origin.z()
+        )
+
+        const directionToTarget = new THREE.Vector3(
+            targetPos.x - currentPosition.x,
             0,
-            targetPos.z - cubeRef.position.z
+            targetPos.z - currentPosition.z
         )
+        const distanceToTarget = directionToTarget.length()
+        directionToTarget.normalize()
 
-        const targetAngle = Math.atan2(direction.x, direction.z) + Math.PI
-        const targetQuaternion = new THREE.Quaternion()
-        targetQuaternion.setFromAxisAngle(
-            new THREE.Vector3(0, 1, 0),
-            targetAngle
-        )
+        const baseForceMagnitude = 5
+        const forceMagnitude =
+            distanceToTarget > 2
+                ? baseForceMagnitude
+                : baseForceMagnitude * (distanceToTarget / 2)
 
-        const distance = cubeRef.position.distanceTo(targetPos)
-        const movementSpeed = 0.1
-        const rotationSpeed = 0.1
-
-        if (distance > 1.1) {
-            const step = direction.multiplyScalar(movementSpeed / distance)
-            cubeRef.quaternion.slerp(targetQuaternion, rotationSpeed)
-            cubeRef.position.add(step)
-            camera.position.add(step)
+        if (distanceToTarget > 0.5) {
+            const translationalForce = new ammo.btVector3(
+                directionToTarget.x * forceMagnitude,
+                0,
+                directionToTarget.z * forceMagnitude
+            )
+            rigidBody.activate()
+            rigidBody.setLinearVelocity(translationalForce)
+            ammo.destroy(translationalForce)
         } else {
             if (pointer) {
                 pointer.visible = false
             }
         }
+
+        ammo.destroy(transform)
 
         requestAnimationFrame(animateCube)
     }

@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { useSceneContext } from './SceneContext'
 
 type PlayerCameraProps = {
-    target: THREE.Object3D
+    target: any
 }
 
 const PlayerCamera: Component<PlayerCameraProps> = ({ target }) => {

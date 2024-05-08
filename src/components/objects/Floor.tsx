@@ -22,7 +22,7 @@ const Floor: Component<FloorProps> = ({ onFloorCreated }) => {
         floor = new THREE.Mesh(floorGeometry, floorMaterial)
 
         floor.rotation.x = -Math.PI / 2
-        floor.position.y = -1
+        floor.position.y = -2
         floor.receiveShadow = true
 
         scene.add(floor)
@@ -30,7 +30,11 @@ const Floor: Component<FloorProps> = ({ onFloorCreated }) => {
 
         onFloorCreated(floor)
 
-        const rigid = createRigidBody(floor, 0)
+        const rigid = createRigidBody(floor, 0, {
+            width: 20,
+            height: 20,
+            depth: 0
+        })
         rigid && physicsWorld && physicsWorld()?.addRigidBody(rigid)
         return () => {
             if (floor) {

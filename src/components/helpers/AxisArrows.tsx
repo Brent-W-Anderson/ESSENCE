@@ -9,7 +9,7 @@ const AxisArrows: Component<AxisArrowsProps> = ({ parent }) => {
     const arrowX = new THREE.ArrowHelper(
         new THREE.Vector3(1, 0, 0),
         new THREE.Vector3(0, 0, 0),
-        1,
+        2,
         0xff0000
     )
     parent.add(arrowX)
@@ -17,7 +17,7 @@ const AxisArrows: Component<AxisArrowsProps> = ({ parent }) => {
     const arrowY = new THREE.ArrowHelper(
         new THREE.Vector3(0, 0, 1),
         new THREE.Vector3(0, 0, 0),
-        1,
+        2,
         0x0000ff
     )
     parent.add(arrowY)
@@ -25,7 +25,7 @@ const AxisArrows: Component<AxisArrowsProps> = ({ parent }) => {
     const arrowZ = new THREE.ArrowHelper(
         new THREE.Vector3(0, 1, 0),
         new THREE.Vector3(0, 0, 0),
-        1,
+        2,
         0x00ff00
     )
     parent.add(arrowZ)

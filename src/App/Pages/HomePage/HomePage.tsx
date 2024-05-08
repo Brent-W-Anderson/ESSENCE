@@ -8,7 +8,8 @@ import PlayerMovement from '../../../components/scene/PlayerMovement'
 import Renderer from '../../../components/scene/Renderer'
 
 const HomePage: Component = () => {
-    const [cubeRef, setCubeRef] = createSignal<THREE.Object3D>()
+    const [cubeRef, setCubeRef] = createSignal<any>()
+    const [test, setTest] = createSignal<any>()
     const [floorRef, setFloorRef] = createSignal<THREE.Object3D>()
 
     return (
@@ -17,11 +18,11 @@ const HomePage: Component = () => {
             <Renderer>
                 <Lights />
 
-                <Cube onCubeCreated={setCubeRef} useGravity/>
+                <Cube onCubeCreated={setCubeRef} setTest={setTest} useGravity />
                 <Floor onFloorCreated={setFloorRef} />
-                {cubeRef() && floorRef() && (
+                {cubeRef() && test() && floorRef() && (
                     <>
-                        <PlayerCamera target={cubeRef()!} />
+                        <PlayerCamera target={test()!} />
                         <PlayerMovement
                             cubeRef={cubeRef()!}
                             floorRef={floorRef()!}
