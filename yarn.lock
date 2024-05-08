@@ -1115,6 +1115,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ammojs3@npm:^0.0.11":
+  version: 0.0.11
+  resolution: "ammojs3@npm:0.0.11"
+  checksum: 10c0/06180d422973f573b7d23de07e0e3b0c851ee7c7c967d7beb9b50ded3a176d0eb5bcaa1ed8d07fb0441f207801a2834c5e7b77264fd0a55533b1505eda2e1ccd
+  languageName: node
+  linkType: hard
+
 "ansi-regex@npm:^5.0.1":
   version: 5.0.1
   resolution: "ansi-regex@npm:5.0.1"
@@ -2632,6 +2639,7 @@ __metadata:
     "@types/three": "npm:^0"
     "@typescript-eslint/eslint-plugin": "npm:^7.8.0"
     "@typescript-eslint/parser": "npm:^7.8.0"
+    ammojs3: "npm:^0.0.11"
     concurrently: "npm:^8.2.2"
     eslint: "npm:^9.1.1"
     eslint-config-prettier: "npm:^9.1.0"

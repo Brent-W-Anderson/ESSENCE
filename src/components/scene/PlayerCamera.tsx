@@ -1,15 +1,17 @@
 import { createEffect, Component } from 'solid-js'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { useSceneContext } from './SceneContext'
 
 type PlayerCameraProps = {
-    scene: THREE.Scene
-    camera: THREE.PerspectiveCamera
-    renderer: THREE.WebGLRenderer
     target: THREE.Object3D
 }
 
-const PlayerCamera: Component<PlayerCameraProps> = ({ scene, camera, renderer, target }) => {
+const PlayerCamera: Component<PlayerCameraProps> = ({ target }) => {
+    const context = useSceneContext()
+    if (!context) return
+
+    const { scene, camera, renderer } = context
     const controls = new OrbitControls(camera, renderer.domElement)
 
     // Default to no rotation
@@ -53,6 +55,5 @@ const PlayerCamera: Component<PlayerCameraProps> = ({ scene, camera, renderer, t
 
     return null
 }
-
 
 export default PlayerCamera

@@ -1,6 +1,7 @@
 import { Route } from '@solidjs/router'
 import { lazy } from 'solid-js'
 import COPY from '../../assets/COPY'
+import { SceneProvider } from '../../components/scene/SceneContext'
 import style from './Pages.module.scss'
 
 const HomePage = lazy(() => import('./HomePage/HomePage'))
@@ -14,7 +15,9 @@ export const Pages = () => (
             path={HOME}
             component={() => (
                 <div class={style.page}>
-                    <HomePage />
+                    <SceneProvider>
+                        <HomePage />
+                    </SceneProvider>
                 </div>
             )}
         />

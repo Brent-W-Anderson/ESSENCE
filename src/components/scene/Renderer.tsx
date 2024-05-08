@@ -1,19 +1,16 @@
-import { createEffect, Component } from 'solid-js'
-import * as THREE from 'three'
+import { createEffect, Component, JSX } from 'solid-js'
+import { useSceneContext } from './SceneContext'
 
 type RendererProps = {
-    children?: any
-    scene: THREE.Scene
-    camera: THREE.Camera
-    renderer: THREE.WebGLRenderer
+    children?: JSX.Element | JSX.Element[]
 }
 
-const Renderer: Component<RendererProps> = ({
-    children,
-    scene,
-    camera,
-    renderer
-}) => {    
+const Renderer: Component<RendererProps> = ({ children }) => {
+    const context = useSceneContext()
+    if (!context) return
+
+    const { scene, camera, renderer } = context
+
     createEffect(() => {
         renderer.shadowMap.enabled = true
 

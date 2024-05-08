@@ -1,13 +1,17 @@
 import { Component, onMount } from 'solid-js'
 import * as THREE from 'three'
 import positionController from '../helpers/PositionController'
+import { useSceneContext } from '../scene/SceneContext'
 
 type FloorProps = {
-    scene: THREE.Scene
     onFloorCreated: (floor: THREE.Mesh) => void
 }
 
-const Floor: Component<FloorProps> = ({ scene, onFloorCreated }) => {
+const Floor: Component<FloorProps> = ({ onFloorCreated }) => {
+    const context = useSceneContext()
+    if (!context) return
+
+    const { scene, physicsWorld, createRigidBody } = context
     let floor: THREE.Mesh | null = null
 
     onMount(() => {
@@ -18,7 +22,7 @@ const Floor: Component<FloorProps> = ({ scene, onFloorCreated }) => {
         floor = new THREE.Mesh(floorGeometry, floorMaterial)
 
         floor.rotation.x = -Math.PI / 2
-        floor.position.y = -0.5
+        floor.position.y = -1
         floor.receiveShadow = true
 
         scene.add(floor)
@@ -26,9 +30,12 @@ const Floor: Component<FloorProps> = ({ scene, onFloorCreated }) => {
 
         onFloorCreated(floor)
 
+        const rigid = createRigidBody(floor, 0)
+        rigid && physicsWorld && physicsWorld()?.addRigidBody(rigid)
         return () => {
             if (floor) {
                 scene.remove(floor)
+                rigid && physicsWorld && physicsWorld()?.removeRigidBody(rigid)
                 positionController.removeObject('floor')
             }
         }
