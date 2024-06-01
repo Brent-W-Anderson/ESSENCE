@@ -19,8 +19,15 @@ const HomePage: Component = () => {
             <Renderer>
                 <Lights />
 
-                <Cube setPlayerRef={setPlayerRef} setRigidPlayerRef={setRigidPlayerRef} useGravity />
+                {/* objects */}
+                <Cube 
+                    setPlayerRef={setPlayerRef}
+                    setRigidPlayerRef={setRigidPlayerRef}
+                    useGravity
+                />
                 <Floor onFloorCreated={setFloorRef} />
+
+                {/* movement controller */}
                 {playerRef() && rigidPlayerRef() && floorRef() && (
                     <>
                         <PlayerCamera playerRef={playerRef()!} />

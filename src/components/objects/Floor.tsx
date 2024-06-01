@@ -19,8 +19,8 @@ const Floor: Component<FloorProps> = ({ onFloorCreated }) => {
         const floorMaterial = new THREE.MeshStandardMaterial({
             color: 0xcccccc
         })
+        
         floor = new THREE.Mesh(floorGeometry, floorMaterial)
-
         floor.rotation.x = -Math.PI / 2
         floor.position.y = -2
         floor.receiveShadow = true
