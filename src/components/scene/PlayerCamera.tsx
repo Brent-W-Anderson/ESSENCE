@@ -5,6 +5,7 @@ import { useSceneContext } from './SceneContext'
 
 const floatPolarAngle = false
 const floatAzimuthAngle = false
+const cameraFloatEasing = 0.05
 
 let currentPolarAngle = 1
 let currentAzimuthAngle = 0
@@ -103,7 +104,7 @@ const PlayerCamera: Component<{
                 .addScaledVector(direction, targetDistance)
 
             // Update the camera's position smoothly
-            camera.position.lerp(newCameraPosition, 0.1)
+            camera.position.lerp(newCameraPosition, cameraFloatEasing)
         }
 
         controls.update()

@@ -2,19 +2,18 @@ import * as Ammo from 'ammojs3'
 import { Component, onMount } from 'solid-js'
 import * as THREE from 'three'
 import AxisArrows from '../helpers/AxisArrows'
-import positionController from '../helpers/PositionController'
 import { useSceneContext } from '../scene/SceneContext'
 
-type CubeProps = {
-    setPlayerRef: (cube: THREE.Group | THREE.Mesh) => void
+const Player: Component<{
+    setPlayerRef: (player: THREE.Group | THREE.Mesh) => void
     setRigidPlayerRef: (rigidBody: Ammo.default.btRigidBody) => void
     useGravity?: boolean
-}
-
-const Cube: Component<CubeProps> = ({
+    initialPosition?: { x: number; y: number; z: number }
+}> = ({
     setPlayerRef,
     setRigidPlayerRef,
-    useGravity = false
+    useGravity = false,
+    initialPosition = { x: 0, y: 0, z: 0 }
 }) => {
     const context = useSceneContext()
     if (!context) return
@@ -23,18 +22,24 @@ const Cube: Component<CubeProps> = ({
     const group = new THREE.Group()
 
     onMount(() => {
-        const geometry = new THREE.SphereGeometry(1, 20, 20)
+        const geometry = new THREE.SphereGeometry(1, 40, 40)
         const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
-        const cube = new THREE.Mesh(geometry, material)
+        const player = new THREE.Mesh(geometry, material)
 
-        cube.castShadow = true
-        cube.receiveShadow = true
+        player.castShadow = true
+        player.receiveShadow = true
 
-        group.add(cube)
+        // Set the initial position
+        group.position.set(
+            initialPosition.x,
+            initialPosition.y,
+            initialPosition.z
+        )
+
+        group.add(player)
         scene.add(group)
-        positionController.addObject('cube', group)
 
-        const rigidBody = createRigidBody(cube, 10, {
+        const rigidBody = createRigidBody(group, 1, {
             width: 1,
             height: 1,
             depth: 1
@@ -53,11 +58,10 @@ const Cube: Component<CubeProps> = ({
                 physicsWorld &&
                 useGravity &&
                 physicsWorld()?.removeRigidBody(rigidBody)
-            positionController.removeObject('cube')
         }
     })
 
     return <AxisArrows parent={group} />
 }
 
-export default Cube
+export default Player

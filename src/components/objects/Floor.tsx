@@ -1,6 +1,5 @@
 import { Component, onMount } from 'solid-js'
 import * as THREE from 'three'
-import positionController from '../helpers/PositionController'
 import { useSceneContext } from '../scene/SceneContext'
 
 type FloorProps = {
@@ -26,7 +25,6 @@ const Floor: Component<FloorProps> = ({ onFloorCreated }) => {
         floor.receiveShadow = true
 
         scene.add(floor)
-        positionController.addObject('floor', floor)
 
         onFloorCreated(floor)
 
@@ -40,7 +38,6 @@ const Floor: Component<FloorProps> = ({ onFloorCreated }) => {
             if (floor) {
                 scene.remove(floor)
                 rigid && physicsWorld && physicsWorld()?.removeRigidBody(rigid)
-                positionController.removeObject('floor')
             }
         }
     })

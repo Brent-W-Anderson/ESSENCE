@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import PlayerMovementPointer from './PlayerMovementPointer'
 import { useSceneContext } from './SceneContext'
 
-const playerMovementSpeed = 10
+const playerMovementSpeed = 12
 const playerRotationSpeed = 0.15
 
 const PlayerMovement: Component<{
@@ -108,7 +108,7 @@ const PlayerMovement: Component<{
             // half of player object width.
             const translationalForce = new ammo.btVector3(
                 directionToTarget.x * forceMagnitude,
-                0,
+                rigidPlayerRef.getLinearVelocity().y(),
                 directionToTarget.z * forceMagnitude
             )
             rigidPlayerRef.activate()

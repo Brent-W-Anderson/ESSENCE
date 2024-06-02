@@ -42,11 +42,11 @@ const Lights: Component = () => {
         directionalLight.shadow.camera.bottom = -100
 
         // Optional: Increase shadow map size for better quality shadows
-        directionalLight.shadow.mapSize.width = 4096
-        directionalLight.shadow.mapSize.height = 4096
+        directionalLight.shadow.mapSize.width = 8192
+        directionalLight.shadow.mapSize.height = 8192
 
-        // Adjust bias to avoid shadow acne artifacts
-        directionalLight.shadow.bias = -0.0001
+        // Smooth shadows by setting the radius
+        directionalLight.shadow.radius = 2
 
         scene.add(ambientLight)
         scene.add(directionalLight)

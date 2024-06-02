@@ -1,7 +1,7 @@
 import * as Ammo from 'ammojs3'
 import { Component, createSignal } from 'solid-js'
 import * as THREE from 'three'
-import Cube from '../../../components/objects/Cube'
+import Player from '../../../components/objects/Player'
 import Floor from '../../../components/objects/Floor'
 import Lights from '../../../components/scene/Lights'
 import PlayerCamera from '../../../components/scene/PlayerCamera'
@@ -21,9 +21,10 @@ const HomePage: Component = () => {
                 <Lights />
 
                 {/* objects */}
-                <Cube
+                <Player
                     setPlayerRef={setPlayerRef}
                     setRigidPlayerRef={setRigidPlayerRef}
+                    initialPosition={{ x: 0, y: 2, z: 0 }}
                     useGravity
                 />
                 <Floor onFloorCreated={setFloorRef} />

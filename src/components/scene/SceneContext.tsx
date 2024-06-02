@@ -27,6 +27,7 @@ interface SceneContextType {
     AmmoLib: Accessor<typeof Ammo.default>
 }
 
+const playerCameraDistance = 20
 const SceneContext = createContext<SceneContextType>()
 
 export const SceneProvider: Component<ComponentProps<any>> = props => {
@@ -37,9 +38,9 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
         75,
         window.innerWidth / window.innerHeight,
         0.1,
-        1000
+        100 // view distance
     )
-    camera.position.set(5, 10, 5)
+    camera.position.set(0, playerCameraDistance, 0)
 
     const renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(window.innerWidth, window.innerHeight)
