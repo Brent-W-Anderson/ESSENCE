@@ -5,7 +5,8 @@ import {
     Component,
     createSignal,
     createEffect,
-    ComponentProps
+    ComponentProps,
+    Accessor
 } from 'solid-js'
 import * as THREE from 'three'
 
@@ -13,14 +14,17 @@ interface SceneContextType {
     scene: THREE.Scene
     camera: THREE.PerspectiveCamera
     renderer: THREE.WebGLRenderer
-    updateMesh: (mesh: THREE.Group | THREE.Mesh, rigidBody: Ammo.default.btRigidBody) => void
+    updateMesh: (
+        mesh: THREE.Group | THREE.Mesh,
+        rigidBody: Ammo.default.btRigidBody
+    ) => void
     createRigidBody: (
         mesh: THREE.Group | THREE.Mesh,
         mass: number,
         size: { width: number; height: number; depth: number }
     ) => Ammo.default.btRigidBody
     physicsWorld?: () => Ammo.default.btDiscreteDynamicsWorld | undefined
-    AmmoLib: any
+    AmmoLib: Accessor<typeof Ammo.default>
 }
 
 const SceneContext = createContext<SceneContextType>()
@@ -101,7 +105,10 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
         }
     }
 
-    const updateMesh = (mesh: THREE.Group | THREE.Mesh, rigidBody: Ammo.default.btRigidBody) => {
+    const updateMesh = (
+        mesh: THREE.Group | THREE.Mesh,
+        rigidBody: Ammo.default.btRigidBody
+    ) => {
         const ammo = AmmoLib()
 
         if (ammo) {
