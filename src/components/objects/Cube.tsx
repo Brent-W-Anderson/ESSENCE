@@ -1,9 +1,9 @@
+import * as Ammo from 'ammojs3'
 import { Component, onMount } from 'solid-js'
 import * as THREE from 'three'
 import AxisArrows from '../helpers/AxisArrows'
 import positionController from '../helpers/PositionController'
 import { useSceneContext } from '../scene/SceneContext'
-import * as Ammo from 'ammojs3'
 
 type CubeProps = {
     setPlayerRef: (cube: THREE.Group | THREE.Mesh) => void

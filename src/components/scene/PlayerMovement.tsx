@@ -1,8 +1,8 @@
-import { Accessor, Component, createEffect, createSignal } from 'solid-js'
+import * as Ammo from 'ammojs3'
+import { Component, createEffect, createSignal } from 'solid-js'
 import * as THREE from 'three'
 import PlayerMovementPointer from './PlayerMovementPointer'
 import { useSceneContext } from './SceneContext'
-import * as Ammo from 'ammojs3'
 
 interface PlayerMovementProps {
     rigidPlayerRef: Ammo.default.btRigidBody

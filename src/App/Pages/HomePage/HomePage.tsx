@@ -1,3 +1,4 @@
+import * as Ammo from 'ammojs3'
 import { Component, createSignal } from 'solid-js'
 import * as THREE from 'three'
 import Cube from '../../../components/objects/Cube'
@@ -6,10 +7,10 @@ import Lights from '../../../components/scene/Lights'
 import PlayerCamera from '../../../components/scene/PlayerCamera'
 import PlayerMovement from '../../../components/scene/PlayerMovement'
 import Renderer from '../../../components/scene/Renderer'
-import * as Ammo from 'ammojs3'
 
 const HomePage: Component = () => {
-    const [rigidPlayerRef, setRigidPlayerRef] = createSignal<Ammo.default.btRigidBody>()
+    const [rigidPlayerRef, setRigidPlayerRef] =
+        createSignal<Ammo.default.btRigidBody>()
     const [playerRef, setPlayerRef] = createSignal<THREE.Group | THREE.Mesh>()
     const [floorRef, setFloorRef] = createSignal<THREE.Mesh>()
 
@@ -20,7 +21,7 @@ const HomePage: Component = () => {
                 <Lights />
 
                 {/* objects */}
-                <Cube 
+                <Cube
                     setPlayerRef={setPlayerRef}
                     setRigidPlayerRef={setRigidPlayerRef}
                     useGravity
