@@ -4,15 +4,13 @@ import * as THREE from 'three'
 import PlayerMovementPointer from './PlayerMovementPointer'
 import { useSceneContext } from './SceneContext'
 
-interface PlayerMovementProps {
+const playerMovementSpeed = 10
+const playerRotationSpeed = 0.15
+
+const PlayerMovement: Component<{
     rigidPlayerRef: Ammo.default.btRigidBody
     floorRef: THREE.Object3D
-}
-
-const PlayerMovement: Component<PlayerMovementProps> = ({
-    rigidPlayerRef,
-    floorRef
-}) => {
+}> = ({ rigidPlayerRef, floorRef }) => {
     const context = useSceneContext()
     if (!context) return
 
@@ -47,11 +45,12 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
     }
 
     const onMouseDown = (event: MouseEvent) => {
+        // left-click
         if (event.button === 0) {
             updateMousePosition(event)
             updateTargetPosition()
 
-            intervalId = window.setInterval(updateTargetPosition, 100)
+            intervalId = window.setInterval(updateTargetPosition, 10)
         }
     }
 
@@ -63,6 +62,13 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
     }
 
     const calculateDirectionToTarget = (currentPosition: THREE.Vector3) => {
+        if (targetPos.equals(new THREE.Vector3(0, 0, 0))) {
+            return {
+                directionToTarget: new THREE.Vector3(),
+                distanceToTarget: 0
+            }
+        }
+
         const directionToTarget = new THREE.Vector3(
             targetPos.x - currentPosition.x,
             0,
@@ -70,6 +76,7 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
         )
         const distanceToTarget = directionToTarget.length()
         directionToTarget.normalize()
+
         return { directionToTarget, distanceToTarget }
     }
 
@@ -78,13 +85,27 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
         distanceToTarget: number,
         ammo: typeof Ammo.default
     ) => {
-        const baseForceMagnitude = 5
-        const forceMagnitude =
-            distanceToTarget > 2
-                ? baseForceMagnitude
-                : baseForceMagnitude * (distanceToTarget / 2)
+        let forceMagnitude = playerMovementSpeed
+        let adjusted = false
+
+        // prevents stutter by exponentially slowing down within for-loop.
+        const maxStopDistance = Math.ceil(playerMovementSpeed / 4)
+        for (let i = 1; i <= maxStopDistance; i++) {
+            const minForce = (i - 1) * 4
+            const maxForce = i * 4
+            if (forceMagnitude <= maxForce && distanceToTarget <= i) {
+                forceMagnitude = playerMovementSpeed * (distanceToTarget / i)
+                adjusted = true
+                break
+            }
+        }
+
+        if (!adjusted) {
+            forceMagnitude = playerMovementSpeed
+        }
 
         if (distanceToTarget > 0.5) {
+            // half of player object width.
             const translationalForce = new ammo.btVector3(
                 directionToTarget.x * forceMagnitude,
                 0,
@@ -96,6 +117,8 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
         } else {
             if (pointer) {
                 pointer.visible = false
+                // Clear the target position
+                targetPos.set(0, 0, 0)
             }
         }
     }
@@ -106,6 +129,7 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
         ammo: typeof Ammo.default
     ) => {
         if (distanceToTarget > 0.5) {
+            // half of player object width.
             // Compute the rotation quaternion to look at the target
             const currentTransform = rigidPlayerRef.getWorldTransform()
             const currentRotation = currentTransform.getRotation()
@@ -123,8 +147,7 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
             )
 
             // Interpolate between the current and target quaternion
-            const step = 0.1 // Adjust this value to control the rotation speed
-            currentQuat.slerp(targetQuaternion, step)
+            currentQuat.slerp(targetQuaternion, playerRotationSpeed)
 
             // Update the rigid body rotation
             currentTransform.setRotation(
@@ -139,7 +162,7 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
         }
     }
 
-    const animateCube = () => {
+    const animatePlayer = () => {
         const ammo = context.AmmoLib()
 
         const transform = new ammo.btTransform()
@@ -157,7 +180,7 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
         applyRotation(directionToTarget, distanceToTarget, ammo)
 
         ammo.destroy(transform)
-        requestAnimationFrame(animateCube)
+        requestAnimationFrame(animatePlayer)
     }
 
     createEffect(() => {
@@ -165,7 +188,7 @@ const PlayerMovement: Component<PlayerMovementProps> = ({
         document.addEventListener('mouseup', onMouseUp)
         document.addEventListener('mousemove', updateMousePosition)
 
-        animateCube()
+        animatePlayer()
 
         return () => {
             document.removeEventListener('mousedown', onMouseDown)

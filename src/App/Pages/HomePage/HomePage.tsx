@@ -16,7 +16,7 @@ const HomePage: Component = () => {
 
     return (
         <>
-            <h1>HomePage - Cube Test</h1>
+            <h1>PLAYER MOVEMENT - TEST</h1>
             <Renderer>
                 <Lights />
 

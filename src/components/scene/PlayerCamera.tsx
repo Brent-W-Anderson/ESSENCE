@@ -3,18 +3,21 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { useSceneContext } from './SceneContext'
 
-type PlayerCameraProps = {
-    playerRef: THREE.Group | THREE.Mesh
-}
+const floatPolarAngle = false
+const floatAzimuthAngle = false
 
-const PlayerCamera: Component<PlayerCameraProps> = ({ playerRef }) => {
+let currentPolarAngle = 1
+let currentAzimuthAngle = 0
+
+const PlayerCamera: Component<{
+    playerRef: THREE.Group | THREE.Mesh
+}> = ({ playerRef }) => {
     const context = useSceneContext()
     if (!context) return
 
     const { scene, camera, renderer } = context
     const controls = new OrbitControls(camera, renderer.domElement)
     let targetDistance = 5
-    let initialDirection = new THREE.Vector3(0, 0, 1) // Initial direction vector
     let isUserInteracting = false
 
     // Default to no rotation
@@ -27,7 +30,7 @@ const PlayerCamera: Component<PlayerCameraProps> = ({ playerRef }) => {
 
     // Limit rotation range
     controls.minPolarAngle = 0.2
-    controls.maxPolarAngle = Math.PI / 3
+    controls.maxPolarAngle = 1
     controls.rotateSpeed = 0.5
 
     // Set zoom distance limits
@@ -45,30 +48,62 @@ const PlayerCamera: Component<PlayerCameraProps> = ({ playerRef }) => {
     // Track user interaction
     controls.addEventListener('start', () => {
         isUserInteracting = true
+        renderer.domElement.style.cursor = 'grabbing'
     })
 
     controls.addEventListener('end', () => {
         isUserInteracting = false
-        targetDistance = camera.position.distanceTo(controls.target)
-        // Update the initial direction when user releases the right-click
-        initialDirection
-            .copy(camera.position)
-            .sub(playerRef.position)
-            .normalize()
+        renderer.domElement.style.cursor = 'pointer'
+        targetDistance = camera.position.distanceTo(playerRef.position)
     })
 
     const animate = () => {
         // Always update the controls target to follow the player
         controls.target.copy(playerRef.position)
 
-        if (!isUserInteracting) {
-            // Calculate the new camera position based on the initial direction and target distance
-            const newCameraPosition = new THREE.Vector3()
-                .copy(playerRef.position)
-                .addScaledVector(initialDirection, targetDistance)
+        if (isUserInteracting) {
+            controls.minPolarAngle = 0.2
+            controls.maxPolarAngle = 1
+            currentPolarAngle = controls.getPolarAngle()
 
-            // Update the camera's position
-            camera.position.lerp(newCameraPosition, 1)
+            controls.minAzimuthAngle = -Infinity
+            controls.maxAzimuthAngle = Infinity
+            currentAzimuthAngle = controls.getAzimuthalAngle()
+
+            // While user is interacting, maintain the distance
+            const direction = new THREE.Vector3()
+                .copy(camera.position)
+                .sub(playerRef.position)
+                .normalize()
+
+            camera.position.copy(
+                playerRef.position
+                    .clone()
+                    .addScaledVector(direction, targetDistance)
+            )
+        } else {
+            if (!floatPolarAngle) {
+                controls.minPolarAngle = currentPolarAngle
+                controls.maxPolarAngle = currentPolarAngle
+            }
+
+            if (!floatAzimuthAngle) {
+                controls.minAzimuthAngle = currentAzimuthAngle
+                controls.maxAzimuthAngle = currentAzimuthAngle
+            }
+
+            // When not interacting, smoothly move the camera to the target position
+            const direction = new THREE.Vector3()
+                .copy(camera.position)
+                .sub(playerRef.position)
+                .normalize()
+
+            let newCameraPosition = new THREE.Vector3()
+                .copy(playerRef.position)
+                .addScaledVector(direction, targetDistance)
+
+            // Update the camera's position smoothly
+            camera.position.lerp(newCameraPosition, 0.1)
         }
 
         controls.update()
@@ -77,6 +112,7 @@ const PlayerCamera: Component<PlayerCameraProps> = ({ playerRef }) => {
 
     createEffect(() => {
         scene.add(camera)
+        targetDistance = camera.position.distanceTo(playerRef.position)
         animate()
 
         onCleanup(() => {
