@@ -1,4 +1,5 @@
 export type Styles = {
+    icon: string
     NAV: string
 }
 

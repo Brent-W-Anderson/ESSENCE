@@ -1,6 +1,5 @@
-const ROUTE = {
-    HOME: '/',
-    LOGIN: '/login'
+const ROUTE={
+    HOME: '/'
 }
 
 export default ROUTE

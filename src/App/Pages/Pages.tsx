@@ -1,13 +1,12 @@
 import { Route } from '@solidjs/router'
 import { lazy } from 'solid-js'
 import COPY from '../../assets/COPY'
-import { SceneProvider } from '../../components/scene/SceneContext'
+import { SceneProvider } from '../../components/_scene/SceneContext'
 import style from './Pages.module.scss'
 
 const HomePage = lazy(() => import('./HomePage/HomePage'))
-const LoginPage = lazy(() => import('./LoginPage/LoginPage'))
 
-const { HOME, LOGIN } = COPY.ROUTE
+const { HOME } = COPY.ROUTE
 
 export const Pages = () => (
     <>
@@ -15,18 +14,10 @@ export const Pages = () => (
             path={HOME}
             component={() => (
                 <div class={style.page}>
+                    {/* use a scene context provider with each new scene */}
                     <SceneProvider>
                         <HomePage />
                     </SceneProvider>
-                </div>
-            )}
-        />
-
-        <Route
-            path={LOGIN}
-            component={() => (
-                <div class={style.page}>
-                    <LoginPage />
                 </div>
             )}
         />

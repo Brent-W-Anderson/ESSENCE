@@ -152,7 +152,7 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
                 solver,
                 collisionConfiguration
             )
-            world.setGravity(new AmmoLibrary.btVector3(0, -9.81, 0))
+            world.setGravity(new AmmoLibrary.btVector3(0, -50, 0))
 
             setPhysicsWorld(world)
             setAmmoLib(AmmoLibrary)

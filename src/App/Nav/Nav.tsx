@@ -12,7 +12,7 @@ export const Nav = ({
     <>
         <nav id={style.NAV}>
             <a href={ROUTE.HOME}>{NAV.HOME}</a>
-            <a href={ROUTE.LOGIN}>{NAV.LOGIN}</a>
+            <div class={style.icon}>{NAV.SETTINGS()}</div>
         </nav>
 
         {children}

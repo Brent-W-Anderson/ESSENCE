@@ -1,8 +1,8 @@
 import * as Ammo from 'ammojs3'
 import { Component, onMount } from 'solid-js'
 import * as THREE from 'three'
-import AxisArrows from '../helpers/AxisArrows'
-import { useSceneContext } from '../scene/SceneContext'
+import AxisArrows from '../_helpers/AxisArrows'
+import { useSceneContext } from '../_scene/SceneContext'
 
 const Player: Component<{
     setPlayerRef: (player: THREE.Group | THREE.Mesh) => void
@@ -18,11 +18,14 @@ const Player: Component<{
     const context = useSceneContext()
     if (!context) return
 
-    const { scene, physicsWorld, createRigidBody, updateMesh } = context
+    const { scene, physicsWorld, createRigidBody, updateMesh, AmmoLib } =
+        context
+    const ammo = context.AmmoLib()
     const group = new THREE.Group()
 
     onMount(() => {
-        const geometry = new THREE.SphereGeometry(1, 40, 40)
+        const radius = 1
+        const geometry = new THREE.CapsuleGeometry(radius, 8, 40, 40)
         const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
         const player = new THREE.Mesh(geometry, material)
 
@@ -40,12 +43,15 @@ const Player: Component<{
         scene.add(group)
 
         const rigidBody = createRigidBody(group, 1, {
-            width: 1,
-            height: 1,
-            depth: 1
+            width: radius,
+            height: 8 - Math.PI * radius,
+            depth: radius
         })
+
         if (useGravity) {
             rigidBody && physicsWorld && physicsWorld()?.addRigidBody(rigidBody)
+            rigidBody.setAngularFactor(new ammo.btVector3(0, 0, 0))
+
             updateMesh(group, rigidBody)
         }
 

@@ -1,5 +1,33 @@
+$icon-size: 28px;
+
 #NAV {
+    pointer-events: none;
+    user-select: none;
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 24px;
     gap: 24px;
+
+    a {
+        pointer-events: all;
+    }
+
+    .icon {
+        pointer-events: all;
+        height: $icon-size;
+
+        svg {
+            cursor: pointer;
+            width: $icon-size;
+            height: $icon-size;
+        }
+    }
+
+    a,
+    .icon {
+        &:active {
+            opacity: 0.5;
+        }
+    }
 }

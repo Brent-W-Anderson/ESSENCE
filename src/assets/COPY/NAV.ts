@@ -1,6 +1,8 @@
-const NAV = {
+import { SettingsIcon } from "../icons"
+
+const NAV={
     HOME: 'HOME',
-    LOGIN: 'LOGIN'
+    SETTINGS: SettingsIcon
 }
 
 export default NAV

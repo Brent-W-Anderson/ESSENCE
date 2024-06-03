@@ -6,6 +6,7 @@ import { useSceneContext } from './SceneContext'
 
 const playerMovementSpeed = 12
 const playerRotationSpeed = 0.15
+const jumpForce = 16
 
 const PlayerMovement: Component<{
     rigidPlayerRef: Ammo.default.btRigidBody
@@ -15,18 +16,33 @@ const PlayerMovement: Component<{
     if (!context) return
 
     const [mouse, setMouse] = createSignal(new THREE.Vector2(0, 0))
-    const { scene, camera } = context
+    const { scene, camera, renderer } = context
+    const fallVelocityTolerance = 0.1
     let targetPos = new THREE.Vector3()
     let intervalId: number | null = null
     let pointer: THREE.Object3D | null = null
+    let isJumping = false
+    let jumped = false
+    let isRightClickHeld = false
 
     const updateMousePosition = (event: MouseEvent) => {
-        setMouse(
-            new THREE.Vector2(
-                (event.clientX / window.innerWidth) * 2 - 1,
-                -(event.clientY / window.innerHeight) * 2 + 1
-            )
+        const mouseVec = new THREE.Vector2(
+            (event.clientX / window.innerWidth) * 2 - 1,
+            -(event.clientY / window.innerHeight) * 2 + 1
         )
+        setMouse(mouseVec)
+
+        const raycaster = new THREE.Raycaster()
+        raycaster.setFromCamera(mouseVec, camera)
+        const intersects = raycaster.intersectObjects([floorRef])
+
+        if (isRightClickHeld) {
+            renderer.domElement.style.cursor = 'grabbing'
+        } else if (intersects.length > 0) {
+            renderer.domElement.style.cursor = 'pointer'
+        } else {
+            renderer.domElement.style.cursor = 'default'
+        }
     }
 
     const updateTargetPosition = () => {
@@ -45,12 +61,13 @@ const PlayerMovement: Component<{
     }
 
     const onMouseDown = (event: MouseEvent) => {
-        // left-click
         if (event.button === 0) {
             updateMousePosition(event)
             updateTargetPosition()
-
             intervalId = window.setInterval(updateTargetPosition, 10)
+        } else if (event.button === 2) {
+            isRightClickHeld = true
+            updateMousePosition(event)
         }
     }
 
@@ -58,6 +75,16 @@ const PlayerMovement: Component<{
         if (event.button === 0 && intervalId !== null) {
             clearInterval(intervalId)
             intervalId = null
+        } else if (event.button === 2) {
+            isRightClickHeld = false
+            updateMousePosition(event)
+        }
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+        if (event.key === ' ' && !jumped) {
+            isJumping = true
+            jumped = true
         }
     }
 
@@ -88,15 +115,18 @@ const PlayerMovement: Component<{
         let forceMagnitude = playerMovementSpeed
         let adjusted = false
 
-        // prevents stutter by exponentially slowing down within for-loop.
-        const maxStopDistance = Math.ceil(playerMovementSpeed / 4)
-        for (let i = 1; i <= maxStopDistance; i++) {
-            const minForce = (i - 1) * 4
-            const maxForce = i * 4
-            if (forceMagnitude <= maxForce && distanceToTarget <= i) {
-                forceMagnitude = playerMovementSpeed * (distanceToTarget / i)
-                adjusted = true
-                break
+        if (!jumped) {
+            // prevents stutter by exponentially slowing down within for-loop.
+            const maxStopDistance = Math.ceil(playerMovementSpeed / 4)
+            for (let i = 1; i <= maxStopDistance; i++) {
+                const minForce = (i - 1) * 4
+                const maxForce = i * 4
+                if (forceMagnitude <= maxForce && distanceToTarget <= i) {
+                    forceMagnitude =
+                        playerMovementSpeed * (distanceToTarget / i)
+                    adjusted = true
+                    break
+                }
             }
         }
 
@@ -162,6 +192,29 @@ const PlayerMovement: Component<{
         }
     }
 
+    const applyJumpForce = (ammo: typeof Ammo.default) => {
+        if (isJumping) {
+            const currentVelocity = rigidPlayerRef.getLinearVelocity()
+            if (Math.abs(currentVelocity.y()) < fallVelocityTolerance) {
+                const jumpVelocity = new ammo.btVector3(
+                    currentVelocity.x(),
+                    jumpForce,
+                    currentVelocity.z()
+                )
+                rigidPlayerRef.setLinearVelocity(jumpVelocity)
+                ammo.destroy(jumpVelocity)
+                isJumping = false
+            }
+        }
+    }
+
+    const checkIfGrounded = (ammo: typeof Ammo.default) => {
+        const currentVelocity = rigidPlayerRef.getLinearVelocity()
+        if (Math.abs(currentVelocity.y()) < fallVelocityTolerance) {
+            jumped = false
+        }
+    }
+
     const animatePlayer = () => {
         const ammo = context.AmmoLib()
 
@@ -178,6 +231,8 @@ const PlayerMovement: Component<{
             calculateDirectionToTarget(currentPosition)
         applyMovementForce(directionToTarget, distanceToTarget, ammo)
         applyRotation(directionToTarget, distanceToTarget, ammo)
+        applyJumpForce(ammo)
+        checkIfGrounded(ammo)
 
         ammo.destroy(transform)
         requestAnimationFrame(animatePlayer)
@@ -187,6 +242,7 @@ const PlayerMovement: Component<{
         document.addEventListener('mousedown', onMouseDown)
         document.addEventListener('mouseup', onMouseUp)
         document.addEventListener('mousemove', updateMousePosition)
+        document.addEventListener('keydown', onKeyDown)
 
         animatePlayer()
 
@@ -194,6 +250,7 @@ const PlayerMovement: Component<{
             document.removeEventListener('mousedown', onMouseDown)
             document.removeEventListener('mouseup', onMouseUp)
             document.removeEventListener('mousemove', updateMousePosition)
+            document.removeEventListener('keydown', onKeyDown)
 
             if (intervalId !== null) {
                 clearInterval(intervalId)

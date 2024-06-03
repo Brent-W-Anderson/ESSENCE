@@ -10,6 +10,13 @@ const cameraFloatEasing = 0.05
 let currentPolarAngle = 1
 let currentAzimuthAngle = 0
 
+const keysPressed: { [key: string]: { pressed: boolean; speed: number } } = {
+    w: { pressed: false, speed: 0.01 },
+    a: { pressed: false, speed: 0.02 },
+    s: { pressed: false, speed: 0.01 },
+    d: { pressed: false, speed: 0.02 }
+}
+
 const PlayerCamera: Component<{
     playerRef: THREE.Group | THREE.Mesh
 }> = ({ playerRef }) => {
@@ -49,14 +56,52 @@ const PlayerCamera: Component<{
     // Track user interaction
     controls.addEventListener('start', () => {
         isUserInteracting = true
-        renderer.domElement.style.cursor = 'grabbing'
     })
 
     controls.addEventListener('end', () => {
         isUserInteracting = false
-        renderer.domElement.style.cursor = 'pointer'
         targetDistance = camera.position.distanceTo(playerRef.position)
     })
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+        const key = event.key.toLowerCase()
+        if (key in keysPressed) {
+            keysPressed[key].pressed = true
+        }
+    }
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+        const key = event.key.toLowerCase()
+        if (key in keysPressed) {
+            keysPressed[key].pressed = false
+        }
+    }
+
+    const updateCameraAngles = () => {
+        if (keysPressed.w.pressed) {
+            currentPolarAngle = Math.max(
+                0.2,
+                currentPolarAngle - keysPressed.w.speed
+            )
+        }
+        if (keysPressed.s.pressed) {
+            currentPolarAngle = Math.min(
+                1,
+                currentPolarAngle + keysPressed.s.speed
+            )
+        }
+        if (keysPressed.a.pressed) {
+            currentAzimuthAngle += keysPressed.a.speed
+        }
+        if (keysPressed.d.pressed) {
+            currentAzimuthAngle -= keysPressed.d.speed
+        }
+        controls.minPolarAngle = currentPolarAngle
+        controls.maxPolarAngle = currentPolarAngle
+        controls.minAzimuthAngle = currentAzimuthAngle
+        controls.maxAzimuthAngle = currentAzimuthAngle
+        controls.update()
+    }
 
     const animate = () => {
         // Always update the controls target to follow the player
@@ -83,6 +128,8 @@ const PlayerCamera: Component<{
                     .addScaledVector(direction, targetDistance)
             )
         } else {
+            updateCameraAngles()
+
             if (!floatPolarAngle) {
                 controls.minPolarAngle = currentPolarAngle
                 controls.maxPolarAngle = currentPolarAngle
@@ -116,9 +163,14 @@ const PlayerCamera: Component<{
         targetDistance = camera.position.distanceTo(playerRef.position)
         animate()
 
+        window.addEventListener('keydown', handleKeyDown)
+        window.addEventListener('keyup', handleKeyUp)
+
         onCleanup(() => {
             scene.remove(camera)
             controls.dispose()
+            window.removeEventListener('keydown', handleKeyDown)
+            window.removeEventListener('keyup', handleKeyUp)
         })
     })
 

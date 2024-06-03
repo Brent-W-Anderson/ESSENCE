@@ -1,6 +1,6 @@
 import { Component, onMount } from 'solid-js'
 import * as THREE from 'three'
-import { useSceneContext } from '../scene/SceneContext'
+import { useSceneContext } from '../_scene/SceneContext'
 
 type FloorProps = {
     onFloorCreated: (floor: THREE.Mesh) => void
@@ -21,7 +21,7 @@ const Floor: Component<FloorProps> = ({ onFloorCreated }) => {
 
         floor = new THREE.Mesh(floorGeometry, floorMaterial)
         floor.rotation.x = -Math.PI / 2
-        floor.position.y = -2
+        floor.position.y = 0
         floor.receiveShadow = true
 
         scene.add(floor)

@@ -10,7 +10,9 @@ const PlayerMovementPointer: Component<PointerProps> = ({
     scene,
     onPointerCreated
 }) => {
-    const pointerGeometry = new THREE.CylinderGeometry(0.05, 0.05, 5, 32)
+    const height = 6
+    const pointerGeometry = new THREE.CylinderGeometry(0.05, 0.05, height, 32)
+    pointerGeometry.translate(0, height / 2, 0)
     const pointerMaterial = new THREE.MeshPhongMaterial({
         color: 0xff0000,
         emissive: 0xff0000,
@@ -19,9 +21,6 @@ const PlayerMovementPointer: Component<PointerProps> = ({
         opacity: 0.7
     })
     const pointer = new THREE.Mesh(pointerGeometry, pointerMaterial)
-
-    pointer.rotation.y = Math.PI / 2
-    pointer.visible = false
 
     createEffect(() => {
         scene.add(pointer)
