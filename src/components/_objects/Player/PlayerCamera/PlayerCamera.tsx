@@ -1,20 +1,20 @@
 import { createEffect, onCleanup, Component } from 'solid-js'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { useSceneContext } from './SceneContext'
+import { useSceneContext } from '../../../_Scene/SceneContext'
 
 const floatPolarAngle = false
 const floatAzimuthAngle = false
-const cameraFloatEasing = 0.05
+const cameraFloatEasing = 1
 
 let currentPolarAngle = 1
 let currentAzimuthAngle = 0
 
 const keysPressed: { [key: string]: { pressed: boolean; speed: number } } = {
-    w: { pressed: false, speed: 0.01 },
-    a: { pressed: false, speed: 0.02 },
-    s: { pressed: false, speed: 0.01 },
-    d: { pressed: false, speed: 0.02 }
+    ArrowUp: { pressed: false, speed: 0.01 },
+    ArrowLeft: { pressed: false, speed: 0.02 },
+    ArrowDown: { pressed: false, speed: 0.01 },
+    ArrowRight: { pressed: false, speed: 0.02 }
 }
 
 const PlayerCamera: Component<{
@@ -64,37 +64,37 @@ const PlayerCamera: Component<{
     })
 
     const handleKeyDown = (event: KeyboardEvent) => {
-        const key = event.key.toLowerCase()
+        const key = event.key
         if (key in keysPressed) {
             keysPressed[key].pressed = true
         }
     }
 
     const handleKeyUp = (event: KeyboardEvent) => {
-        const key = event.key.toLowerCase()
+        const key = event.key
         if (key in keysPressed) {
             keysPressed[key].pressed = false
         }
     }
 
     const updateCameraAngles = () => {
-        if (keysPressed.w.pressed) {
+        if (keysPressed.ArrowUp.pressed) {
             currentPolarAngle = Math.max(
                 0.2,
-                currentPolarAngle - keysPressed.w.speed
+                currentPolarAngle - keysPressed.ArrowUp.speed
             )
         }
-        if (keysPressed.s.pressed) {
+        if (keysPressed.ArrowDown.pressed) {
             currentPolarAngle = Math.min(
                 1,
-                currentPolarAngle + keysPressed.s.speed
+                currentPolarAngle + keysPressed.ArrowDown.speed
             )
         }
-        if (keysPressed.a.pressed) {
-            currentAzimuthAngle += keysPressed.a.speed
+        if (keysPressed.ArrowLeft.pressed) {
+            currentAzimuthAngle += keysPressed.ArrowLeft.speed
         }
-        if (keysPressed.d.pressed) {
-            currentAzimuthAngle -= keysPressed.d.speed
+        if (keysPressed.ArrowRight.pressed) {
+            currentAzimuthAngle -= keysPressed.ArrowRight.speed
         }
         controls.minPolarAngle = currentPolarAngle
         controls.maxPolarAngle = currentPolarAngle
