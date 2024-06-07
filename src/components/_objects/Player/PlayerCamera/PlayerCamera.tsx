@@ -10,11 +10,14 @@ const cameraFloatEasing = 1
 let currentPolarAngle = 1
 let currentAzimuthAngle = 0
 
+const arrowKeyRotationSensitivity = 0.02
+const mouseRotationSensitivity = 0.003
+
 const keysPressed: { [key: string]: { pressed: boolean; speed: number } } = {
     ArrowUp: { pressed: false, speed: 0.01 },
-    ArrowLeft: { pressed: false, speed: 0.02 },
+    ArrowLeft: { pressed: false, speed: arrowKeyRotationSensitivity },
     ArrowDown: { pressed: false, speed: 0.01 },
-    ArrowRight: { pressed: false, speed: 0.02 }
+    ArrowRight: { pressed: false, speed: arrowKeyRotationSensitivity }
 }
 
 const PlayerCamera: Component<{
@@ -27,9 +30,13 @@ const PlayerCamera: Component<{
     const controls = new OrbitControls(camera, renderer.domElement)
     let targetDistance = 5
     let isUserInteracting = false
+    let mouseDown = false
+    let startX = 0
+    let startY = 0
+    let initialDistance = 0
 
     // Default to no rotation
-    controls.enableRotate = true
+    controls.enableRotate = false // Disable internal OrbitControls rotation
 
     // Limit controls to prevent panning
     controls.enablePan = false
@@ -53,15 +60,49 @@ const PlayerCamera: Component<{
     }
     controls.update()
 
-    // Track user interaction
-    controls.addEventListener('start', () => {
-        isUserInteracting = true
-    })
+    const handleMouseDown = (event: MouseEvent) => {
+        if (event.button === 2) {
+            // Right-click
+            mouseDown = true
+            startX = event.clientX
+            startY = event.clientY
+            isUserInteracting = true
+            initialDistance = camera.position.distanceTo(playerRef.position)
+        }
+    }
 
-    controls.addEventListener('end', () => {
-        isUserInteracting = false
-        targetDistance = camera.position.distanceTo(playerRef.position)
-    })
+    const handleMouseUp = (event: MouseEvent) => {
+        if (event.button === 2) {
+            // Right-click
+            mouseDown = false
+            isUserInteracting = false
+            targetDistance = camera.position.distanceTo(playerRef.position)
+        }
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+        if (mouseDown) {
+            const deltaX = event.clientX - startX
+            const deltaY = event.clientY - startY
+            startX = event.clientX
+            startY = event.clientY
+
+            currentAzimuthAngle -= deltaX * mouseRotationSensitivity
+            currentPolarAngle = Math.max(
+                0.2,
+                Math.min(
+                    1,
+                    currentPolarAngle - deltaY * mouseRotationSensitivity
+                )
+            )
+
+            controls.minPolarAngle = currentPolarAngle
+            controls.maxPolarAngle = currentPolarAngle
+            controls.minAzimuthAngle = currentAzimuthAngle
+            controls.maxAzimuthAngle = currentAzimuthAngle
+            controls.update()
+        }
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
         const key = event.key
@@ -75,6 +116,14 @@ const PlayerCamera: Component<{
         if (key in keysPressed) {
             keysPressed[key].pressed = false
         }
+    }
+
+    const handleWheel = (event: WheelEvent) => {
+        // Adjust the target distance based on scroll wheel movement
+        targetDistance = Math.max(
+            controls.minDistance,
+            Math.min(controls.maxDistance, targetDistance + event.deltaY * 0.05)
+        )
     }
 
     const updateCameraAngles = () => {
@@ -108,15 +157,7 @@ const PlayerCamera: Component<{
         controls.target.copy(playerRef.position)
 
         if (isUserInteracting) {
-            controls.minPolarAngle = 0.2
-            controls.maxPolarAngle = 1
-            currentPolarAngle = controls.getPolarAngle()
-
-            controls.minAzimuthAngle = -Infinity
-            controls.maxAzimuthAngle = Infinity
-            currentAzimuthAngle = controls.getAzimuthalAngle()
-
-            // While user is interacting, maintain the distance
+            // Skip updating angles based on keyboard if the user is interacting with the mouse
             const direction = new THREE.Vector3()
                 .copy(camera.position)
                 .sub(playerRef.position)
@@ -125,8 +166,9 @@ const PlayerCamera: Component<{
             camera.position.copy(
                 playerRef.position
                     .clone()
-                    .addScaledVector(direction, targetDistance)
+                    .addScaledVector(direction, initialDistance)
             )
+            controls.update()
         } else {
             updateCameraAngles()
 
@@ -152,9 +194,9 @@ const PlayerCamera: Component<{
 
             // Update the camera's position smoothly
             camera.position.lerp(newCameraPosition, cameraFloatEasing)
+            controls.update()
         }
 
-        controls.update()
         requestAnimationFrame(animate)
     }
 
@@ -165,12 +207,20 @@ const PlayerCamera: Component<{
 
         window.addEventListener('keydown', handleKeyDown)
         window.addEventListener('keyup', handleKeyUp)
+        window.addEventListener('mousedown', handleMouseDown)
+        window.addEventListener('mouseup', handleMouseUp)
+        window.addEventListener('mousemove', handleMouseMove)
+        window.addEventListener('wheel', handleWheel, { passive: true })
 
         onCleanup(() => {
             scene.remove(camera)
             controls.dispose()
             window.removeEventListener('keydown', handleKeyDown)
             window.removeEventListener('keyup', handleKeyUp)
+            window.removeEventListener('mousedown', handleMouseDown)
+            window.removeEventListener('mouseup', handleMouseUp)
+            window.removeEventListener('mousemove', handleMouseMove)
+            window.removeEventListener('wheel', handleWheel)
         })
     })
 

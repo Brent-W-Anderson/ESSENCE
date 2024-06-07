@@ -1,4 +1,4 @@
-const ROUTE={
+const ROUTE = {
     HOME: '/'
 }
 

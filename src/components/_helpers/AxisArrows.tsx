@@ -1,4 +1,4 @@
-import { Component, JSX, onCleanup, onMount } from 'solid-js'
+import { Component, onCleanup, onMount } from 'solid-js'
 import * as THREE from 'three'
 
 type AxisArrowsProps = {

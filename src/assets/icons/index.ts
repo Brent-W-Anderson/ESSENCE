@@ -1,3 +1,3 @@
 import Settings from './Settings'
 
-export const SettingsIcon=Settings
+export const SettingsIcon = Settings

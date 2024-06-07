@@ -1,6 +1,6 @@
-import { SettingsIcon } from "../icons"
+import { SettingsIcon } from '../icons'
 
-const NAV={
+const NAV = {
     HOME: 'HOME',
     SETTINGS: SettingsIcon
 }

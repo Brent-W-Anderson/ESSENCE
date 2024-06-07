@@ -21,6 +21,7 @@ $icon-size: 28px;
             cursor: pointer;
             width: $icon-size;
             height: $icon-size;
+            filter: drop-shadow(0 0 2px white);
         }
     }
 

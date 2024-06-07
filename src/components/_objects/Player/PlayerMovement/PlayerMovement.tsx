@@ -1,91 +1,52 @@
 import * as Ammo from 'ammojs3'
 import { Component, createEffect, createSignal, onMount } from 'solid-js'
 import * as THREE from 'three'
-import PlayerMovementPointer from './PlayerMovementPointer'
 import { useSceneContext } from '../../../_Scene/SceneContext'
+import {
+    setupMouseHandlers,
+    updateTargetPosition as updateTargetPositionHandler
+} from './mouseHandlers'
+import PlayerMovementPointer from './PlayerMovementPointer'
 
 const playerMovementSpeed = 12
 const playerRotationSpeed = 0.15
 const jumpForce = 20
-const stepHeight = 0.4
 const fallVelocityTolerance = 0.1 // not sure if this is that important?
+const showRayLines = true
+const stepHeight = 0.4
 
 const PlayerMovement: Component<{
     rigidPlayerRef: Ammo.default.btRigidBody
-    floorRef: THREE.Object3D
-}> = ({ rigidPlayerRef, floorRef }) => {
+    playerMesh: THREE.Object3D
+}> = ({ rigidPlayerRef, playerMesh }) => {
     const context = useSceneContext()
     if (!context) return
 
     const [mouse, setMouse] = createSignal(new THREE.Vector2(0, 0))
+    const [pointer, setPointer] = createSignal<THREE.Object3D | null>(null)
+
     const { scene, camera, renderer } = context
+    const intervalIdRef = { current: null as number | null }
+    const isRightClickHeldRef = { current: false }
+
     let targetPos = new THREE.Vector3()
-    let intervalId: number | null = null
-    let pointer: THREE.Object3D | null = null
-    let isJumping = false
-    let jumped = false
-    let isRightClickHeld = false
     let isWKeyDown = false
     let isAKeyDown = false
     let isSKeyDown = false
     let isDKeyDown = false
+    let isJumping = false
+    let jumped = false
 
     const [rayLines, setRayLines] = createSignal<THREE.Line[]>([])
 
-    const updateMousePosition = (event: MouseEvent) => {
-        const mouseVec = new THREE.Vector2(
-            (event.clientX / window.innerWidth) * 2 - 1,
-            -(event.clientY / window.innerHeight) * 2 + 1
-        )
-        setMouse(mouseVec)
-
-        const raycaster = new THREE.Raycaster()
-        raycaster.setFromCamera(mouseVec, camera)
-        const intersects = raycaster.intersectObjects([floorRef])
-
-        if (isRightClickHeld) {
-            renderer.domElement.style.cursor = 'grabbing'
-        } else if (intersects.length > 0) {
-            renderer.domElement.style.cursor = 'pointer'
-        } else {
-            renderer.domElement.style.cursor = 'default'
-        }
-    }
-
     const updateTargetPosition = () => {
-        const mouseVec = mouse()
-        const raycaster = new THREE.Raycaster()
-        raycaster.setFromCamera(mouseVec, camera)
-
-        const intersects = raycaster.intersectObjects([floorRef])
-        if (intersects.length > 0) {
-            targetPos = intersects[0].point
-            if (pointer) {
-                pointer.position.set(targetPos.x, 0, targetPos.z)
-                pointer.visible = true
-            }
-        }
-    }
-
-    const onMouseDown = (event: MouseEvent) => {
-        if (event.button === 0) {
-            updateMousePosition(event)
-            updateTargetPosition()
-            intervalId = window.setInterval(updateTargetPosition, 10)
-        } else if (event.button === 2) {
-            isRightClickHeld = true
-            updateMousePosition(event)
-        }
-    }
-
-    const onMouseUp = (event: MouseEvent) => {
-        if (event.button === 0 && intervalId !== null) {
-            clearInterval(intervalId)
-            intervalId = null
-        } else if (event.button === 2) {
-            isRightClickHeld = false
-            updateMousePosition(event)
-        }
+        updateTargetPositionHandler(
+            mouse(),
+            camera,
+            scene,
+            playerMesh,
+            targetPos
+        )
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -134,7 +95,6 @@ const PlayerMovement: Component<{
 
         const transform = new ammo.btTransform()
         rigidPlayerRef.getMotionState().getWorldTransform(transform)
-        const origin = transform.getOrigin()
 
         const cameraDirection = new THREE.Vector3()
         camera.getWorldDirection(cameraDirection)
@@ -262,7 +222,6 @@ const PlayerMovement: Component<{
         // prevents stutter by exponentially slowing down within for-loop.
         const maxStopDistance = Math.ceil(playerMovementSpeed / 4)
         for (let i = 1; i <= maxStopDistance; i++) {
-            const minForce = (i - 1) * 4
             const maxForce = i * 4
             if (forceMagnitude <= maxForce && distanceToTarget <= i) {
                 forceMagnitude = playerMovementSpeed * (distanceToTarget / i)
@@ -285,12 +244,11 @@ const PlayerMovement: Component<{
             rigidPlayerRef.activate()
             rigidPlayerRef.setLinearVelocity(translationalForce)
             ammo.destroy(translationalForce)
-        } else {
-            if (pointer) {
-                pointer.visible = false
-                // Clear the target position
-                targetPos.set(0, 0, 0)
-            }
+            pointer()?.position.set(targetPos.x, targetPos.y, targetPos.z)
+        } else if (pointer()) {
+            pointer()!.visible = false
+            // Clear the target position
+            targetPos.set(0, 0, 0)
         }
     }
 
@@ -358,6 +316,8 @@ const PlayerMovement: Component<{
     }
 
     const initializeRayLines = () => {
+        if (!showRayLines) return
+
         const rayCount = 12 // Number of rays to form the quarter-ring
         const radius = 2 // Radius of the ring around the player
         const lines: THREE.Line[] = []
@@ -390,6 +350,8 @@ const PlayerMovement: Component<{
         rotation: THREE.Quaternion,
         playerHalfHeight: number
     ) => {
+        if (!showRayLines) return
+
         const lines = rayLines()
         const radius = 2
 
@@ -483,7 +445,6 @@ const PlayerMovement: Component<{
             context.physicsWorld?.()?.rayTest(rayStart, rayEnd, rayCallback)
 
             if (rayCallback.hasHit()) {
-                const hitPoint = rayCallback.get_m_hitPointWorld()
                 updatePlayerFriction(0)
                 jumped = true
 
@@ -538,32 +499,35 @@ const PlayerMovement: Component<{
     }
 
     createEffect(() => {
-        document.addEventListener('mousedown', onMouseDown)
-        document.addEventListener('mouseup', onMouseUp)
-        document.addEventListener('mousemove', updateMousePosition)
+        const cleanupMouseHandlers = setupMouseHandlers(
+            camera,
+            scene,
+            renderer,
+            setMouse,
+            updateTargetPosition,
+            pointer(),
+            targetPos,
+            intervalIdRef,
+            isRightClickHeldRef
+        )
+
         document.addEventListener('keydown', onKeyDown)
         document.addEventListener('keyup', onKeyUp)
 
         animatePlayer()
 
         return () => {
-            document.removeEventListener('mousedown', onMouseDown)
-            document.removeEventListener('mouseup', onMouseUp)
-            document.removeEventListener('mousemove', updateMousePosition)
-            document.removeEventListener('keydown', onKeyUp)
+            cleanupMouseHandlers()
+            document.removeEventListener('keydown', onKeyDown)
+            document.removeEventListener('keyup', onKeyUp)
 
-            if (intervalId !== null) {
-                clearInterval(intervalId)
+            if (intervalIdRef.current !== null) {
+                clearInterval(intervalIdRef.current)
             }
         }
     })
 
-    return (
-        <PlayerMovementPointer
-            scene={scene}
-            onPointerCreated={obj => (pointer = obj)}
-        />
-    )
+    return <PlayerMovementPointer scene={scene} onPointerCreated={setPointer} />
 }
 
 export default PlayerMovement

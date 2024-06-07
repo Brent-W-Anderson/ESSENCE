@@ -11,9 +11,7 @@ const Cube: Component<{
     const context = useSceneContext()
     if (!context) return null
 
-    const { scene, physicsWorld, createRigidBody, updateMesh, AmmoLib } =
-        context
-    const ammo = AmmoLib()
+    const { scene, physicsWorld, createRigidBody } = context
     let cube: THREE.Mesh | null = null
 
     onMount(() => {

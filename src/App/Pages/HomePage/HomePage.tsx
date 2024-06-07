@@ -1,14 +1,14 @@
 import * as Ammo from 'ammojs3'
-import { Component, createSignal, onMount } from 'solid-js'
+import { Component, createSignal } from 'solid-js'
 import * as THREE from 'three'
-import Player from '../../../components/_Objects/Player/Player'
-import Floor from '../../../components/_Objects/Floor'
-import Lights from '../../../components/_Scene/Lights'
-import PlayerCamera from '../../../components/_Objects/Player/PlayerCamera/PlayerCamera'
-import PlayerMovement from '../../../components/_Objects/Player/PlayerMovement/PlayerMovement'
-import Renderer from '../../../components/_Scene/Renderer'
 import AxisArrows from '../../../components/_Helpers/AxisArrows'
 import Cube from '../../../components/_Objects/Cube'
+import Floor from '../../../components/_Objects/Floor'
+import Player from '../../../components/_Objects/Player/Player'
+import PlayerCamera from '../../../components/_Objects/Player/PlayerCamera/PlayerCamera'
+import PlayerMovement from '../../../components/_Objects/Player/PlayerMovement/PlayerMovement'
+import Lights from '../../../components/_Scene/Lights'
+import Renderer from '../../../components/_Scene/Renderer'
 
 const HomePage: Component = () => {
     const [rigidPlayerRef, setRigidPlayerRef] =
@@ -75,7 +75,7 @@ const HomePage: Component = () => {
                         <PlayerCamera playerRef={playerRef()!} />
                         <PlayerMovement
                             rigidPlayerRef={rigidPlayerRef()!}
-                            floorRef={floorRef()!}
+                            playerMesh={playerRef()!}
                         />
                     </>
                 )}
