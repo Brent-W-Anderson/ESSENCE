@@ -5,14 +5,16 @@ import {
     Component,
     createSignal,
     createEffect,
-    ComponentProps,
     Accessor,
-    Setter
+    Setter,
+    JSX
 } from 'solid-js'
 import * as THREE from 'three'
 
 const playerCameraDistance = 20
 const gravity = -50
+
+type AmmoType = typeof Ammo.default
 
 const SceneContext = createContext<{
     scene: THREE.Scene
@@ -26,9 +28,9 @@ const SceneContext = createContext<{
         mesh: THREE.Group | THREE.Mesh,
         mass: number,
         size: { width: number; height: number; depth: number }
-    ) => Ammo.default.btRigidBody
+    ) => Ammo.default.btRigidBody | undefined
     physicsWorld?: () => Ammo.default.btDiscreteDynamicsWorld | undefined
-    AmmoLib: Accessor<typeof Ammo.default>
+    AmmoLib: Accessor<AmmoType | undefined>
     rigidPlayerRef?: Accessor<Ammo.default.btRigidBody | undefined>
     setRigidPlayerRef?: Setter<Ammo.default.btRigidBody | undefined>
     playerRef?: Accessor<THREE.Group | THREE.Mesh | undefined>
@@ -39,13 +41,15 @@ const SceneContext = createContext<{
 
 const [physicsWorld, setPhysicsWorld] =
     createSignal<Ammo.default.btDiscreteDynamicsWorld>()
-const [AmmoLib, setAmmoLib] = createSignal<any>()
+const [AmmoLib, setAmmoLib] = createSignal<AmmoType>()
 const [rigidPlayerRef, setRigidPlayerRef] =
     createSignal<Ammo.default.btRigidBody>()
 const [playerRef, setPlayerRef] = createSignal<THREE.Group | THREE.Mesh>()
 const [floorRef, setFloorRef] = createSignal<THREE.Mesh>()
 
-export const SceneProvider: Component<ComponentProps<any>> = props => {
+const SceneProvider: Component<{
+    children: JSX.Element | JSX.Element[]
+}> = props => {
     const scene = new THREE.Scene()
     scene.background = new THREE.Color(0xffffff)
 
@@ -166,7 +170,7 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
             world.setGravity(new AmmoLibrary.btVector3(0, gravity, 0))
 
             setPhysicsWorld(world)
-            setAmmoLib(AmmoLibrary)
+            setAmmoLib(() => AmmoLibrary)
 
             animate()
         } catch (error) {
@@ -212,5 +216,7 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
         </SceneContext.Provider>
     )
 }
+
+export default SceneProvider
 
 export const useSceneContext = () => useContext(SceneContext)

@@ -3,8 +3,8 @@ import { Component, createEffect, onMount } from 'solid-js'
 import * as THREE from 'three'
 import { useSceneContext } from '../../../_Scene/SceneContext'
 import { SetupMouseHandlers } from './mouseHandlers'
-import PlayerMovementPointer from './PlayerMovementPointer'
 import { usePlayerMovementContext } from './PlayerMovementContext'
+import PlayerMovementPointer from './PlayerMovementPointer'
 
 const playerMovementSpeed = 12
 const playerRotationSpeed = 0.15
@@ -454,7 +454,7 @@ const PlayerMovement: Component = () => {
     const animatePlayer = () => {
         const ammo = context.AmmoLib()
 
-        const transform = new ammo.btTransform()
+        const transform = new ammo!.btTransform()
         rigidPlayer.getMotionState().getWorldTransform(transform)
         const origin = transform.getOrigin()
         const currentPosition = new THREE.Vector3(
@@ -467,13 +467,13 @@ const PlayerMovement: Component = () => {
 
         const { directionToTarget, distanceToTarget } =
             calculateDirectionToTarget(currentPosition)
-        applyMovementForce(directionToTarget, distanceToTarget, ammo)
-        applyRotation(directionToTarget, distanceToTarget, ammo)
-        applyJumpForce(ammo)
+        applyMovementForce(directionToTarget, distanceToTarget, ammo!)
+        applyRotation(directionToTarget, distanceToTarget, ammo!)
+        applyJumpForce(ammo!)
         checkIfGrounded()
-        detectAndStepOverLedges(ammo)
+        detectAndStepOverLedges(ammo!)
 
-        ammo.destroy(transform)
+        ammo?.destroy(transform)
         requestAnimationFrame(animatePlayer)
     }
 

@@ -1,10 +1,10 @@
 import { Route } from '@solidjs/router'
 import { lazy } from 'solid-js'
 import COPY from '../../assets/COPY'
-import { SceneProvider } from '../../components/_Scene/SceneContext'
 import style from './Pages.module.scss'
 
 const HomePage = lazy(() => import('./HomePage/HomePage'))
+const SceneProvider = lazy(() => import('../../components/_Scene/SceneContext'))
 
 const { HOME } = COPY.ROUTE
 

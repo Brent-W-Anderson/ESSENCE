@@ -1,7 +1,7 @@
 import { Component, onCleanup } from 'solid-js'
-import { usePlayerMovementContext } from './PlayerMovementContext'
 import * as THREE from 'three'
 import { useSceneContext } from '../../../_Scene/SceneContext'
+import { usePlayerMovementContext } from './PlayerMovementContext'
 
 export const SetupMouseHandlers: Component = () => {
     const context = useSceneContext()

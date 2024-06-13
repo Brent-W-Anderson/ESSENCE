@@ -1,4 +1,10 @@
-import { createContext, useContext, createSignal, Component } from 'solid-js'
+import {
+    createContext,
+    useContext,
+    createSignal,
+    Component,
+    JSX
+} from 'solid-js'
 import * as THREE from 'three'
 
 export interface PlayerMovementContextProps {
@@ -33,7 +39,7 @@ export const usePlayerMovementContext = () => {
     return context
 }
 
-export const PlayerMovementProvider: Component<{ children: any }> = props => {
+const PlayerMovementProvider: Component<{ children: JSX.Element }> = props => {
     const [mouse, setMouse] = createSignal(new THREE.Vector2(0, 0))
     const [pointer, setPointer] = createSignal<THREE.Object3D | null>(null)
     const targetPos = new THREE.Vector3()
@@ -75,3 +81,5 @@ export const PlayerMovementProvider: Component<{ children: any }> = props => {
         </PlayerMovementContext.Provider>
     )
 }
+
+export default PlayerMovementProvider

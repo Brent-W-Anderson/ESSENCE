@@ -1,4 +1,4 @@
-import { Component, Setter, onMount } from 'solid-js'
+import { Component, onMount } from 'solid-js'
 import * as THREE from 'three'
 import { useSceneContext } from '../_Scene/SceneContext'
 
