@@ -11,7 +11,10 @@ import {
 } from 'solid-js'
 import * as THREE from 'three'
 
-interface SceneContextType {
+const playerCameraDistance = 20
+const gravity = -50
+
+const SceneContext = createContext<{
     scene: THREE.Scene
     camera: THREE.PerspectiveCamera
     renderer: THREE.WebGLRenderer
@@ -32,10 +35,7 @@ interface SceneContextType {
     setPlayerRef?: Setter<THREE.Group | THREE.Mesh | undefined>
     floorRef?: Accessor<THREE.Mesh | undefined>
     setFloorRef?: Setter<THREE.Mesh | undefined>
-}
-
-const playerCameraDistance = 20
-const SceneContext = createContext<SceneContextType>()
+}>()
 
 const [physicsWorld, setPhysicsWorld] =
     createSignal<Ammo.default.btDiscreteDynamicsWorld>()
@@ -163,7 +163,7 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
                 solver,
                 collisionConfiguration
             )
-            world.setGravity(new AmmoLibrary.btVector3(0, -50, 0))
+            world.setGravity(new AmmoLibrary.btVector3(0, gravity, 0))
 
             setPhysicsWorld(world)
             setAmmoLib(AmmoLibrary)
@@ -185,9 +185,7 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
     createEffect(() => {
         initializeAmmo()
         updateRendererSize()
-    })
 
-    createEffect(() => {
         window.addEventListener('resize', updateRendererSize)
         return () => window.removeEventListener('resize', updateRendererSize)
     })
