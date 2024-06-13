@@ -5,7 +5,7 @@ import { useSceneContext } from '../../../_Scene/SceneContext'
 
 const floatPolarAngle = false
 const floatAzimuthAngle = false
-const cameraFloatEasing = 1
+const cameraFloatEasing = 0.1
 
 let currentPolarAngle = 1
 let currentAzimuthAngle = 0
@@ -20,11 +20,14 @@ const keysPressed: { [key: string]: { pressed: boolean; speed: number } } = {
     ArrowRight: { pressed: false, speed: arrowKeyRotationSensitivity }
 }
 
-const PlayerCamera: Component<{
-    playerRef: THREE.Group | THREE.Mesh
-}> = ({ playerRef }) => {
+const PlayerCamera: Component = () => {
     const context = useSceneContext()
-    if (!context) return
+    if (!context) return null
+
+    const { playerRef } = context
+    const player = playerRef?.() as THREE.Object3D
+
+    if (!player) return null
 
     const { scene, camera, renderer } = context
     const controls = new OrbitControls(camera, renderer.domElement)
@@ -53,7 +56,7 @@ const PlayerCamera: Component<{
     controls.maxDistance = 20
     controls.zoomSpeed = 3
 
-    controls.target.copy(playerRef.position)
+    controls.target.copy(player.position)
     controls.mouseButtons = {
         LEFT: null,
         RIGHT: THREE.MOUSE.ROTATE
@@ -67,7 +70,7 @@ const PlayerCamera: Component<{
             startX = event.clientX
             startY = event.clientY
             isUserInteracting = true
-            initialDistance = camera.position.distanceTo(playerRef.position)
+            initialDistance = camera.position.distanceTo(player.position)
         }
     }
 
@@ -76,7 +79,7 @@ const PlayerCamera: Component<{
             // Right-click
             mouseDown = false
             isUserInteracting = false
-            targetDistance = camera.position.distanceTo(playerRef.position)
+            targetDistance = camera.position.distanceTo(player.position)
         }
     }
 
@@ -154,17 +157,17 @@ const PlayerCamera: Component<{
 
     const animate = () => {
         // Always update the controls target to follow the player
-        controls.target.copy(playerRef.position)
+        controls.target.copy(player.position)
 
         if (isUserInteracting) {
             // Skip updating angles based on keyboard if the user is interacting with the mouse
             const direction = new THREE.Vector3()
                 .copy(camera.position)
-                .sub(playerRef.position)
+                .sub(player.position)
                 .normalize()
 
             camera.position.copy(
-                playerRef.position
+                player.position
                     .clone()
                     .addScaledVector(direction, initialDistance)
             )
@@ -185,11 +188,11 @@ const PlayerCamera: Component<{
             // When not interacting, smoothly move the camera to the target position
             const direction = new THREE.Vector3()
                 .copy(camera.position)
-                .sub(playerRef.position)
+                .sub(player.position)
                 .normalize()
 
             let newCameraPosition = new THREE.Vector3()
-                .copy(playerRef.position)
+                .copy(player.position)
                 .addScaledVector(direction, targetDistance)
 
             // Update the camera's position smoothly
@@ -202,7 +205,7 @@ const PlayerCamera: Component<{
 
     createEffect(() => {
         scene.add(camera)
-        targetDistance = camera.position.distanceTo(playerRef.position)
+        targetDistance = camera.position.distanceTo(player.position)
         animate()
 
         window.addEventListener('keydown', handleKeyDown)

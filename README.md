@@ -2,21 +2,21 @@
 
 ## TODO:
 
-### - add context to playterMovement, so there's not so much prop drilling.
+### - allow AxisArrows to drag objects around the scene.
 
-### - don't let the bumper lines continuously keep jumping if in range and no volicity in the z/x direction.
+### - split up PlayerMovement component more. -- start with key-bindings, since mouse-bindings are done.
 
-### - PlayerMovementPointer sometimes shows up a lot higher than it should.
+### - PlayerMovementPointer sometimes shows up a lot higher than it should (I think it's registering the AxisArrows and the player still).
+
+### - don't let the bumper lines continuously keep jumping if in range and no volicity in the z/x direction (jumping up and down continuously over ledge).
 
 ### - when clicking a targeted location add a delay before moving to register the click (if click is being held, only delay initially).
 
-### - BUG: don't allow the player to hold themselves against the wall if the jump is too high (needs to slide down).
+### - BUG: don't allow the player to hold themselves against the wall if the jump is too high (needs to slide down -- keep track of how this is done, might want to impliment this on certain terain to climb).
 
-### - player shouldn't try and walk through objects if they're in the direct line to the target destination (add pathing).
+### - player shouldn't try and walk through objects if they're in the direct line to the target destination (add smart pathing).
 
-### - holding shift should allow the player to lock his direction facing with the camera. A & D should now move 90 degrees sideways instead of walking towards that direction. S will walk backwards at 2/3 the speed, but still face forwards in the same direction as the camera.
-
-### - add variable to disable seeing the bumper ray lines.
+### - tapping shift should allow the player to lock his direction facing with the camera. A & D should now move 90 degrees sideways instead of walking towards that direction. S will walk backwards at 2/3 the speed, but still face forwards in the same direction as the camera. -- mouse click alternatives can work the same way.
 
 ### - split up PlayerMovement component more, so it's easier to read.
 

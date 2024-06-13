@@ -6,7 +6,8 @@ import {
     createSignal,
     createEffect,
     ComponentProps,
-    Accessor
+    Accessor,
+    Setter
 } from 'solid-js'
 import * as THREE from 'three'
 
@@ -25,10 +26,24 @@ interface SceneContextType {
     ) => Ammo.default.btRigidBody
     physicsWorld?: () => Ammo.default.btDiscreteDynamicsWorld | undefined
     AmmoLib: Accessor<typeof Ammo.default>
+    rigidPlayerRef?: Accessor<Ammo.default.btRigidBody | undefined>
+    setRigidPlayerRef?: Setter<Ammo.default.btRigidBody | undefined>
+    playerRef?: Accessor<THREE.Group | THREE.Mesh | undefined>
+    setPlayerRef?: Setter<THREE.Group | THREE.Mesh | undefined>
+    floorRef?: Accessor<THREE.Mesh | undefined>
+    setFloorRef?: Setter<THREE.Mesh | undefined>
 }
 
 const playerCameraDistance = 20
 const SceneContext = createContext<SceneContextType>()
+
+const [physicsWorld, setPhysicsWorld] =
+    createSignal<Ammo.default.btDiscreteDynamicsWorld>()
+const [AmmoLib, setAmmoLib] = createSignal<any>()
+const [rigidPlayerRef, setRigidPlayerRef] =
+    createSignal<Ammo.default.btRigidBody>()
+const [playerRef, setPlayerRef] = createSignal<THREE.Group | THREE.Mesh>()
+const [floorRef, setFloorRef] = createSignal<THREE.Mesh>()
 
 export const SceneProvider: Component<ComponentProps<any>> = props => {
     const scene = new THREE.Scene()
@@ -44,10 +59,6 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
 
     const renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(window.innerWidth, window.innerHeight)
-
-    const [physicsWorld, setPhysicsWorld] =
-        createSignal<Ammo.default.btDiscreteDynamicsWorld>()
-    const [AmmoLib, setAmmoLib] = createSignal<any>()
 
     const animate = () => {
         requestAnimationFrame(animate)
@@ -188,7 +199,13 @@ export const SceneProvider: Component<ComponentProps<any>> = props => {
         physicsWorld,
         createRigidBody,
         updateMesh,
-        AmmoLib
+        AmmoLib,
+        rigidPlayerRef,
+        setRigidPlayerRef,
+        playerRef,
+        setPlayerRef,
+        floorRef,
+        setFloorRef
     }
 
     return (

@@ -2,13 +2,13 @@ import { Component, onMount } from 'solid-js'
 import * as THREE from 'three'
 import { useSceneContext } from '../_Scene/SceneContext'
 
-const Floor: Component<{
-    onFloorCreated: (floor: THREE.Mesh) => void
-}> = ({ onFloorCreated }) => {
+const Floor: Component<{ children: any }> = props => {
     const context = useSceneContext()
-    if (!context) return
+    if (!context) return null
 
-    const { scene, physicsWorld, createRigidBody } = context
+    const { scene, physicsWorld, createRigidBody, floorRef, setFloorRef } =
+        context
+
     let floor: THREE.Mesh | null = null
 
     onMount(() => {
@@ -23,7 +23,7 @@ const Floor: Component<{
 
         scene.add(floor)
 
-        onFloorCreated(floor)
+        setFloorRef?.(floor)
 
         const rigid = createRigidBody(floor, 0, {
             width: 20,
@@ -115,7 +115,7 @@ const Floor: Component<{
         }
     })
 
-    return null
+    return <>{floorRef!() && props.children}</>
 }
 
 export default Floor

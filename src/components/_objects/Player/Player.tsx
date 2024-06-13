@@ -4,23 +4,24 @@ import * as THREE from 'three'
 import { useSceneContext } from '../../_Scene/SceneContext'
 
 const Player: Component<{
-    setPlayerRef: (player: THREE.Group | THREE.Mesh) => void
-    setRigidPlayerRef: (rigidBody: Ammo.default.btRigidBody) => void
     useGravity?: boolean
     initialPosition?: { x: number; y: number; z: number }
-}> = ({
-    setPlayerRef,
-    setRigidPlayerRef,
-    useGravity = false,
-    initialPosition = { x: 0, y: 0, z: 0 }
-}) => {
+}> = ({ useGravity = false, initialPosition = { x: 0, y: 0, z: 0 } }) => {
     const context = useSceneContext()
     if (!context) return null
 
-    const { scene, physicsWorld, createRigidBody, updateMesh, AmmoLib } =
-        context
+    const {
+        scene,
+        physicsWorld,
+        createRigidBody,
+        updateMesh,
+        AmmoLib,
+        setPlayerRef,
+        setRigidPlayerRef
+    } = context
     const ammo = AmmoLib()
     const group = new THREE.Group()
+    group.name = 'Player'
 
     onMount(() => {
         const radius = 1
@@ -68,8 +69,8 @@ const Player: Component<{
             updateMesh(group, rigidBody)
         }
 
-        setRigidPlayerRef(rigidBody)
-        setPlayerRef(group)
+        setRigidPlayerRef!(rigidBody)
+        setPlayerRef!(group)
 
         return () => {
             scene.remove(group)

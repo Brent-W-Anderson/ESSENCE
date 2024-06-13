@@ -1,12 +1,10 @@
 import * as Ammo from 'ammojs3'
-import { Component, createEffect, createSignal, onMount } from 'solid-js'
+import { Component, createEffect, onMount } from 'solid-js'
 import * as THREE from 'three'
 import { useSceneContext } from '../../../_Scene/SceneContext'
-import {
-    setupMouseHandlers,
-    updateTargetPosition as updateTargetPositionHandler
-} from './mouseHandlers'
+import { SetupMouseHandlers } from './mouseHandlers'
 import PlayerMovementPointer from './PlayerMovementPointer'
+import { usePlayerMovementContext } from './PlayerMovementContext'
 
 const playerMovementSpeed = 12
 const playerRotationSpeed = 0.15
@@ -15,39 +13,29 @@ const fallVelocityTolerance = 0.1 // not sure if this is that important?
 const showRayLines = true
 const stepHeight = 0.4
 
-const PlayerMovement: Component<{
-    rigidPlayerRef: Ammo.default.btRigidBody
-    playerMesh: THREE.Object3D
-}> = ({ rigidPlayerRef, playerMesh }) => {
+const PlayerMovement: Component = () => {
     const context = useSceneContext()
-    if (!context) return
+    const movementContext = usePlayerMovementContext()
 
-    const [mouse, setMouse] = createSignal(new THREE.Vector2(0, 0))
-    const [pointer, setPointer] = createSignal<THREE.Object3D | null>(null)
+    if (!context || !movementContext) return null
 
-    const { scene, camera, renderer } = context
-    const intervalIdRef = { current: null as number | null }
-    const isRightClickHeldRef = { current: false }
+    const { scene, camera, rigidPlayerRef } = context
+    const rigidPlayer = rigidPlayerRef?.() as Ammo.default.btRigidBody
+    if (!rigidPlayer) return
 
-    let targetPos = new THREE.Vector3()
+    const {
+        pointer: [pointer, setPointer],
+        targetPos,
+        rayLines: [rayLines, setRayLines],
+        intervalIdRef
+    } = movementContext
+
     let isWKeyDown = false
     let isAKeyDown = false
     let isSKeyDown = false
     let isDKeyDown = false
     let isJumping = false
     let jumped = false
-
-    const [rayLines, setRayLines] = createSignal<THREE.Line[]>([])
-
-    const updateTargetPosition = () => {
-        updateTargetPositionHandler(
-            mouse(),
-            camera,
-            scene,
-            playerMesh,
-            targetPos
-        )
-    }
 
     const onKeyDown = (event: KeyboardEvent) => {
         if (event.key === ' ' && !jumped) {
@@ -94,7 +82,7 @@ const PlayerMovement: Component<{
         if (!ammo) return
 
         const transform = new ammo.btTransform()
-        rigidPlayerRef.getMotionState().getWorldTransform(transform)
+        rigidPlayer.getMotionState().getWorldTransform(transform)
 
         const cameraDirection = new THREE.Vector3()
         camera.getWorldDirection(cameraDirection)
@@ -125,7 +113,7 @@ const PlayerMovement: Component<{
 
         if (direction.length() === 0) {
             // Apply slowing down logic
-            const currentVelocity = rigidPlayerRef.getLinearVelocity()
+            const currentVelocity = rigidPlayer.getLinearVelocity()
             const speed = Math.sqrt(
                 currentVelocity.x() * currentVelocity.x() +
                     currentVelocity.z() * currentVelocity.z()
@@ -138,7 +126,7 @@ const PlayerMovement: Component<{
                     currentVelocity.y(),
                     currentVelocity.z() * slowDownFactor
                 )
-                rigidPlayerRef.setLinearVelocity(newVelocity)
+                rigidPlayer.setLinearVelocity(newVelocity)
                 ammo.destroy(newVelocity)
             }
 
@@ -151,12 +139,12 @@ const PlayerMovement: Component<{
         const forceMagnitude = playerMovementSpeed
         const movementForce = new ammo.btVector3(
             direction.x * forceMagnitude,
-            rigidPlayerRef.getLinearVelocity().y(),
+            rigidPlayer.getLinearVelocity().y(),
             direction.z * forceMagnitude
         )
 
         // Update rotation to face the movement direction smoothly
-        const currentTransform = rigidPlayerRef.getWorldTransform()
+        const currentTransform = rigidPlayer.getWorldTransform()
         const currentRotation = currentTransform.getRotation()
         const currentQuat = new THREE.Quaternion(
             currentRotation.x(),
@@ -183,10 +171,10 @@ const PlayerMovement: Component<{
                 currentQuat.w
             )
         )
-        rigidPlayerRef.setWorldTransform(currentTransform)
+        rigidPlayer.setWorldTransform(currentTransform)
 
-        rigidPlayerRef.activate()
-        rigidPlayerRef.setLinearVelocity(movementForce)
+        rigidPlayer.activate()
+        rigidPlayer.setLinearVelocity(movementForce)
 
         ammo.destroy(movementForce)
         ammo.destroy(transform)
@@ -238,11 +226,11 @@ const PlayerMovement: Component<{
             // half of player object width.
             const translationalForce = new ammo.btVector3(
                 directionToTarget.x * forceMagnitude,
-                rigidPlayerRef.getLinearVelocity().y(),
+                rigidPlayer.getLinearVelocity().y(),
                 directionToTarget.z * forceMagnitude
             )
-            rigidPlayerRef.activate()
-            rigidPlayerRef.setLinearVelocity(translationalForce)
+            rigidPlayer.activate()
+            rigidPlayer.setLinearVelocity(translationalForce)
             ammo.destroy(translationalForce)
             pointer()?.position.set(targetPos.x, targetPos.y, targetPos.z)
         } else if (pointer()) {
@@ -260,7 +248,7 @@ const PlayerMovement: Component<{
         if (distanceToTarget > 0.5) {
             // half of player object width.
             // Compute the rotation quaternion to look at the target
-            const currentTransform = rigidPlayerRef.getWorldTransform()
+            const currentTransform = rigidPlayer.getWorldTransform()
             const currentRotation = currentTransform.getRotation()
             const currentQuat = new THREE.Quaternion(
                 currentRotation.x(),
@@ -287,20 +275,20 @@ const PlayerMovement: Component<{
                     currentQuat.w
                 )
             )
-            rigidPlayerRef.setWorldTransform(currentTransform)
+            rigidPlayer.setWorldTransform(currentTransform)
         }
     }
 
     const applyJumpForce = (ammo: typeof Ammo.default) => {
         if (isJumping) {
-            const currentVelocity = rigidPlayerRef.getLinearVelocity()
+            const currentVelocity = rigidPlayer.getLinearVelocity()
             if (Math.abs(currentVelocity.y()) < fallVelocityTolerance) {
                 const jumpVelocity = new ammo.btVector3(
                     currentVelocity.x(),
                     jumpForce,
                     currentVelocity.z()
                 )
-                rigidPlayerRef.setLinearVelocity(jumpVelocity)
+                rigidPlayer.setLinearVelocity(jumpVelocity)
                 ammo.destroy(jumpVelocity)
                 isJumping = false
             }
@@ -308,7 +296,7 @@ const PlayerMovement: Component<{
     }
 
     const checkIfGrounded = () => {
-        const currentVelocity = rigidPlayerRef.getLinearVelocity()
+        const currentVelocity = rigidPlayer.getLinearVelocity()
         if (Math.abs(currentVelocity.y()) < fallVelocityTolerance) {
             jumped = false
             updatePlayerFriction(1)
@@ -316,8 +304,6 @@ const PlayerMovement: Component<{
     }
 
     const initializeRayLines = () => {
-        if (!showRayLines) return
-
         const rayCount = 12 // Number of rays to form the quarter-ring
         const radius = 2 // Radius of the ring around the player
         const lines: THREE.Line[] = []
@@ -337,6 +323,7 @@ const PlayerMovement: Component<{
             ])
             const line = new THREE.Line(geometry, material)
             line.frustumCulled = false
+            line.visible = showRayLines
 
             scene.add(line)
             lines.push(line)
@@ -350,10 +337,8 @@ const PlayerMovement: Component<{
         rotation: THREE.Quaternion,
         playerHalfHeight: number
     ) => {
-        if (!showRayLines) return
-
-        const lines = rayLines()
         const radius = 2
+        const lines = rayLines()
 
         for (let i = 0; i < lines.length; i++) {
             const angle = (i / (lines.length - 1)) * (Math.PI / 2) - Math.PI / 4 // Adjusted to be in front of the player
@@ -395,9 +380,9 @@ const PlayerMovement: Component<{
     }
 
     const detectAndStepOverLedges = (ammo: typeof Ammo.default) => {
-        const currentVelocity = rigidPlayerRef.getLinearVelocity()
+        const currentVelocity = rigidPlayer.getLinearVelocity()
         const transform = new ammo.btTransform()
-        rigidPlayerRef.getMotionState().getWorldTransform(transform)
+        rigidPlayer.getMotionState().getWorldTransform(transform)
         const origin = transform.getOrigin()
 
         // Check if the player is in the air or below the required height
@@ -450,11 +435,11 @@ const PlayerMovement: Component<{
 
                 // Apply a small vertical force to step over the ledge
                 const stepUpVelocity = new ammo.btVector3(
-                    rigidPlayerRef.getLinearVelocity().x(),
+                    rigidPlayer.getLinearVelocity().x(),
                     jumpForce / 2, // Adjust as needed
-                    rigidPlayerRef.getLinearVelocity().z()
+                    rigidPlayer.getLinearVelocity().z()
                 )
-                rigidPlayerRef.setLinearVelocity(stepUpVelocity)
+                rigidPlayer.setLinearVelocity(stepUpVelocity)
                 ammo.destroy(stepUpVelocity)
             }
 
@@ -470,7 +455,7 @@ const PlayerMovement: Component<{
         const ammo = context.AmmoLib()
 
         const transform = new ammo.btTransform()
-        rigidPlayerRef.getMotionState().getWorldTransform(transform)
+        rigidPlayer.getMotionState().getWorldTransform(transform)
         const origin = transform.getOrigin()
         const currentPosition = new THREE.Vector3(
             origin.x(),
@@ -495,29 +480,16 @@ const PlayerMovement: Component<{
     const updatePlayerFriction = (friction: number) => {
         const ammo = context.AmmoLib()
         if (!ammo) return
-        rigidPlayerRef.setFriction(friction)
+        rigidPlayer.setFriction(friction)
     }
 
     createEffect(() => {
-        const cleanupMouseHandlers = setupMouseHandlers(
-            camera,
-            scene,
-            renderer,
-            setMouse,
-            updateTargetPosition,
-            pointer(),
-            targetPos,
-            intervalIdRef,
-            isRightClickHeldRef
-        )
-
         document.addEventListener('keydown', onKeyDown)
         document.addEventListener('keyup', onKeyUp)
 
         animatePlayer()
 
         return () => {
-            cleanupMouseHandlers()
             document.removeEventListener('keydown', onKeyDown)
             document.removeEventListener('keyup', onKeyUp)
 
@@ -527,7 +499,15 @@ const PlayerMovement: Component<{
         }
     })
 
-    return <PlayerMovementPointer scene={scene} onPointerCreated={setPointer} />
+    return (
+        <>
+            <PlayerMovementPointer
+                scene={scene}
+                onPointerCreated={setPointer}
+            />
+            {pointer() && <SetupMouseHandlers />}
+        </>
+    )
 }
 
 export default PlayerMovement
