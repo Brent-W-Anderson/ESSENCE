@@ -1,4 +1,4 @@
-import { Component, createSignal } from 'solid-js'
+import { Component, Suspense, createSignal } from 'solid-js'
 import * as THREE from 'three'
 import AxisArrows from '../../../components/_Helpers/AxisArrows'
 import Cube from '../../../components/_Objects/Cube'
@@ -13,7 +13,7 @@ import { useSceneContext } from '../../../components/_Scene/SceneContext'
 
 const HomePage: Component = () => {
     const context = useSceneContext()
-    if (!context) return null
+    if (!context) return
 
     const { playerRef } = context
     const [objectsRef, setObjectsRef] = createSignal<
@@ -25,7 +25,13 @@ const HomePage: Component = () => {
     }
 
     return (
-        <>
+        <Suspense
+            fallback={
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            }
+        >
             <h1>Player Controller</h1>
 
             <Renderer>
@@ -85,7 +91,7 @@ const HomePage: Component = () => {
                     </PlayerMovementProvider>
                 </Floor>
             </Renderer>
-        </>
+        </Suspense>
     )
 }
 

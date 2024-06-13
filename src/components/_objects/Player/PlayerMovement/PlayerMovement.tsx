@@ -1,4 +1,3 @@
-import * as Ammo from 'ammojs3'
 import { Component, createEffect, onMount } from 'solid-js'
 import * as THREE from 'three'
 import { useSceneContext } from '../../../_Scene/SceneContext'
@@ -20,7 +19,7 @@ const PlayerMovement: Component = () => {
     if (!context || !movementContext) return null
 
     const { scene, camera, rigidPlayerRef } = context
-    const rigidPlayer = rigidPlayerRef?.() as Ammo.default.btRigidBody
+    const rigidPlayer = rigidPlayerRef?.()
     if (!rigidPlayer) return
 
     const {
@@ -202,7 +201,7 @@ const PlayerMovement: Component = () => {
     const applyMovementForce = (
         directionToTarget: THREE.Vector3,
         distanceToTarget: number,
-        ammo: typeof Ammo.default
+        ammo: typeof window.Ammo
     ) => {
         let forceMagnitude = playerMovementSpeed
         let adjusted = false
@@ -243,7 +242,7 @@ const PlayerMovement: Component = () => {
     const applyRotation = (
         directionToTarget: THREE.Vector3,
         distanceToTarget: number,
-        ammo: typeof Ammo.default
+        ammo: typeof window.Ammo
     ) => {
         if (distanceToTarget > 0.5) {
             // half of player object width.
@@ -279,7 +278,7 @@ const PlayerMovement: Component = () => {
         }
     }
 
-    const applyJumpForce = (ammo: typeof Ammo.default) => {
+    const applyJumpForce = (ammo: typeof window.Ammo) => {
         if (isJumping) {
             const currentVelocity = rigidPlayer.getLinearVelocity()
             if (Math.abs(currentVelocity.y()) < fallVelocityTolerance) {
@@ -379,7 +378,7 @@ const PlayerMovement: Component = () => {
         }
     }
 
-    const detectAndStepOverLedges = (ammo: typeof Ammo.default) => {
+    const detectAndStepOverLedges = (ammo: typeof window.Ammo) => {
         const currentVelocity = rigidPlayer.getLinearVelocity()
         const transform = new ammo.btTransform()
         rigidPlayer.getMotionState().getWorldTransform(transform)

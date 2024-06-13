@@ -1,10 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Essence</title>
-	</head>
-    <body></body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Essence</title>
+        <link rel="stylesheet" href="./assets/css/index.css" />
+
+        <!-- Preload ammo.wasm.wasm file -->
+        <link
+            rel="preload"
+            href="./assets/js/ammo.wasm.wasm"
+            as="fetch"
+            type="application/wasm"
+            crossorigin="anonymous"
+        />
+
+        <!-- Preload ammo.wasm.js file -->
+        <link rel="preload" href="./assets/js/ammo.wasm.js" as="fetch" />
+        <script defer src="./assets/js/ammo.wasm.js"></script>
+    </head>
+    <body>
+        <div class="loading">
+            <div class="spinner"></div>
+        </div>
+    </body>
 </html>

@@ -1,17 +1,28 @@
 import { Router } from '@solidjs/router'
-import { render } from 'solid-js/web'
-import { Nav } from './App/Nav/Nav'
-import { Pages } from './App/Pages/Pages'
-import './index.scss'
+import { lazy } from 'solid-js'
+import { Suspense, render } from 'solid-js/web'
+
+const Nav = lazy(() => import('./App/Nav/Nav'))
+const Pages = lazy(() => import('./App/Pages/Pages'))
 
 const root = document.createElement('div')
-root.id = 'app'
+root.id = 'APP'
+
+document.body.innerHTML = ''
 document.body.appendChild(root)
 
 const App = () => (
-    <Router root={Nav}>
-        <Pages />
-    </Router>
+    <Suspense
+        fallback={
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        }
+    >
+        <Router root={Nav}>
+            <Pages />
+        </Router>
+    </Suspense>
 )
 
 render(App, root)

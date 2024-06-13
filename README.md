@@ -2,6 +2,8 @@
 
 ## TODO:
 
+### - move index.css to the src/index.scss and have vite copy it over.
+
 ### - allow AxisArrows to drag objects around the scene.
 
 ### - AxisArrows + coordinates should be larger if they're further from the camera (zooming in-or-out should also decrease/increase font-size).

@@ -1,4 +1,3 @@
-import * as Ammo from 'ammojs3'
 import {
     createContext,
     useContext,
@@ -7,14 +6,13 @@ import {
     createEffect,
     Accessor,
     Setter,
-    JSX
+    JSX,
+    Suspense
 } from 'solid-js'
 import * as THREE from 'three'
 
 const playerCameraDistance = 20
 const gravity = -50
-
-type AmmoType = typeof Ammo.default
 
 const SceneContext = createContext<{
     scene: THREE.Scene
@@ -22,17 +20,17 @@ const SceneContext = createContext<{
     renderer: THREE.WebGLRenderer
     updateMesh: (
         mesh: THREE.Group | THREE.Mesh,
-        rigidBody: Ammo.default.btRigidBody
+        rigidBody: Window['Ammo']['btRigidBody']
     ) => void
     createRigidBody: (
         mesh: THREE.Group | THREE.Mesh,
         mass: number,
         size: { width: number; height: number; depth: number }
-    ) => Ammo.default.btRigidBody | undefined
-    physicsWorld?: () => Ammo.default.btDiscreteDynamicsWorld | undefined
-    AmmoLib: Accessor<AmmoType | undefined>
-    rigidPlayerRef?: Accessor<Ammo.default.btRigidBody | undefined>
-    setRigidPlayerRef?: Setter<Ammo.default.btRigidBody | undefined>
+    ) => Window['Ammo']['btRigidBody'] | undefined
+    physicsWorld?: () => Window['Ammo']['btDiscreteDynamicsWorld'] | undefined
+    AmmoLib: Accessor<typeof window.Ammo | undefined>
+    rigidPlayerRef?: Accessor<Window['Ammo']['btRigidBody'] | undefined>
+    setRigidPlayerRef?: Setter<Window['Ammo']['btRigidBody'] | undefined>
     playerRef?: Accessor<THREE.Group | THREE.Mesh | undefined>
     setPlayerRef?: Setter<THREE.Group | THREE.Mesh | undefined>
     floorRef?: Accessor<THREE.Mesh | undefined>
@@ -40,10 +38,10 @@ const SceneContext = createContext<{
 }>()
 
 const [physicsWorld, setPhysicsWorld] =
-    createSignal<Ammo.default.btDiscreteDynamicsWorld>()
-const [AmmoLib, setAmmoLib] = createSignal<AmmoType>()
+    createSignal<Window['Ammo']['btDiscreteDynamicsWorld']>()
+const [AmmoLib, setAmmoLib] = createSignal<typeof window.Ammo>()
 const [rigidPlayerRef, setRigidPlayerRef] =
-    createSignal<Ammo.default.btRigidBody>()
+    createSignal<Window['Ammo']['btRigidBody']>()
 const [playerRef, setPlayerRef] = createSignal<THREE.Group | THREE.Mesh>()
 const [floorRef, setFloorRef] = createSignal<THREE.Mesh>()
 
@@ -123,7 +121,7 @@ const SceneProvider: Component<{
 
     const updateMesh = (
         mesh: THREE.Group | THREE.Mesh,
-        rigidBody: Ammo.default.btRigidBody
+        rigidBody: Window['Ammo']['btRigidBody']
     ) => {
         const ammo = AmmoLib()
 
@@ -148,7 +146,7 @@ const SceneProvider: Component<{
 
     const initializeAmmo = async () => {
         try {
-            const AmmoLibrary = await Ammo.default()
+            const AmmoLibrary = await window.Ammo()
 
             if (!AmmoLibrary.btDefaultCollisionConfiguration) {
                 throw new Error('Ammo.js initialization failed.')
@@ -211,9 +209,17 @@ const SceneProvider: Component<{
     }
 
     return (
-        <SceneContext.Provider value={store}>
-            {AmmoLib() && props.children}
-        </SceneContext.Provider>
+        <Suspense
+            fallback={
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            }
+        >
+            <SceneContext.Provider value={store}>
+                {AmmoLib() && props.children}
+            </SceneContext.Provider>
+        </Suspense>
     )
 }
 
