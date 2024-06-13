@@ -5,7 +5,7 @@ const coordHeight = 2
 const arrowHeight = 0.5
 const font = 'Bold 24px Arial'
 const fontColor = 'black'
-const showAxisArrows = false
+const showAxisArrows = true
 
 const AxisArrows: Component<{
     mesh?: THREE.Object3D

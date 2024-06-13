@@ -4,9 +4,15 @@
 
 ### - allow AxisArrows to drag objects around the scene.
 
+### - AxisArrows + coordinates should be larger if they're further from the camera (zooming in-or-out should also decrease/increase font-size).
+
+### - zooming in should look at the top of the player, not the center.
+
+### - add settings for individual objects (on hover - shows available object settings) vs global settings on the cogwheel.
+
 ### - split up PlayerMovement component more. -- start with key-bindings, since mouse-bindings are done.
 
-### - PlayerMovementPointer sometimes shows up a lot higher than it should (I think it's registering the AxisArrows and the player still).
+### - PlayerMovementPointer sometimes shows up a lot higher than it should (I think it's registering the AxisArrows, player, and possibly the ray lines).
 
 ### - don't let the bumper lines continuously keep jumping if in range and no volicity in the z/x direction (jumping up and down continuously over ledge).
 
