@@ -20,7 +20,8 @@ export default defineConfig( {
         viteCompression( {
             algorithm: 'gzip',
             ext: '.gz',
-            deleteOriginFile: false
+            deleteOriginFile: false,
+            filter: ( file ) => !/\.(html|css|ico)$/.test( file )
         } )
     ],
     build: {
@@ -38,6 +39,10 @@ export default defineConfig( {
                         }
 
                         if ( id.includes( 'three' ) ) {
+                            if ( id.includes( 'three/examples/jsm/controls' ) ) {
+                                return 'three-controls'
+                            }
+
                             return 'vendor-three'
                         }
 

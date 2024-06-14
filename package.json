@@ -2,15 +2,16 @@
     "name": "essence",
     "type": "module",
     "scripts": {
-        "start": "concurrently \"yarn vite\" \"yarn generate:scss-types\"",
-        "build": "vite build",
+        "start": "yarn build:css && concurrently \"yarn vite\" \"yarn generate:scss-types\"",
+        "build": "yarn build:css && vite build",
+        "build:css": "sass --no-source-map src/index.scss public/assets/css/index.css",
         "lint": "concurrently \"yarn lint:js\" \"yarn lint:styles\"",
         "lint:fix": "concurrently \"yarn lint:js:fix\" \"yarn lint:styles:fix\"",
         "lint:js": "eslint --config .eslintrc.config.cjs",
         "lint:js:fix": "eslint --fix --config .eslintrc.config.cjs",
         "lint:styles": "stylelint \"**/*.scss\"",
         "lint:styles:fix": "stylelint \"**/*.scss\" --fix",
-        "generate:scss-types": "typed-scss-modules src --exportType default --nameFormat none -w"
+        "generate:scss-types": "typed-scss-modules \"src/**/*.module.scss\" --exportType default --nameFormat none -w"
     },
     "devDependencies": {
         "@types/three": "^0.165.0",

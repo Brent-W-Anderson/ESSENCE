@@ -2,11 +2,15 @@
 
 ## TODO:
 
-### - move index.css to the src/index.scss and have vite copy it over.
+### - setup backend to handle serving the .gz compressed files.
 
-### - allow AxisArrows to drag objects around the scene.
+### - cleanup build terminal warnings (non-critical).
+
+### - add ammojs3 back as a dependency, but use vite to copy the .wasm & .js from node_modules into dist/assets/js.
 
 ### - AxisArrows + coordinates should be larger if they're further from the camera (zooming in-or-out should also decrease/increase font-size).
+
+### - allow AxisArrows to drag objects around the scene.
 
 ### - zooming in should look at the top of the player, not the center.
 
