@@ -4,6 +4,7 @@ import { createHtmlPlugin } from 'vite-plugin-html'
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
+import path from 'path'
 
 export default defineConfig( {
     base: '/',
@@ -82,6 +83,7 @@ export default defineConfig( {
     },
     resolve: {
         alias: {
+            '@': path.resolve( __dirname, 'src' ),
             fs: 'empty-module',
             path: 'empty-module'
         }

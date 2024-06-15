@@ -1,5 +1,5 @@
 import { JSX } from 'solid-js'
-import COPY from '../../assets/COPY'
+import COPY from '@/assets/COPY'
 import style from './Nav.module.scss'
 
 const { ROUTE, NAV } = COPY

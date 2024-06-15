@@ -1,6 +1,6 @@
 import { Component, onMount } from 'solid-js'
 import * as THREE from 'three'
-import { useSceneContext } from '../_Scene/SceneContext'
+import { useSceneContext } from '@/components/_Scene/SceneContext'
 
 const Cube: Component<{
     index: number

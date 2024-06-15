@@ -1,7 +1,7 @@
 import { createEffect, onCleanup, Component } from 'solid-js'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { useSceneContext } from '../../../_Scene/SceneContext'
+import { useSceneContext } from '@/components/_Scene/SceneContext'
 
 const floatPolarAngle = false
 const floatAzimuthAngle = false

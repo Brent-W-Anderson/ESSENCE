@@ -1,6 +1,6 @@
 import { Component, JSX, onMount } from 'solid-js'
 import * as THREE from 'three'
-import { useSceneContext } from '../_Scene/SceneContext'
+import { useSceneContext } from '@/components/_Scene/SceneContext'
 
 const Floor: Component<{ children: JSX.Element | JSX.Element[] }> = props => {
     const context = useSceneContext()

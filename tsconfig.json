@@ -37,7 +37,8 @@
             /* Specify a set of entries that re-map imports to additional lookup locations. */
             "ammoWasm": ["node_modules/ammojs3/dist/ammo.d.ts"],
             "ammoWasmAmbient": ["node_modules/ammojs3/dist/ammo-ambient.d.ts"],
-            "*": [".yarn/cache/*"]
+            "*": [".yarn/cache/*"],
+            "@/*": ["src/*"]
         },
         // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
         "typeRoots": [
