@@ -3,6 +3,7 @@ import solidPlugin from 'vite-plugin-solid'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 export default defineConfig( {
     base: '/',
@@ -15,13 +16,29 @@ export default defineConfig( {
         } ),
         visualizer( {
             filename: './dist/stats.html',
-            open: false
+            open: false,
         } ),
         viteCompression( {
             algorithm: 'gzip',
             ext: '.gz',
             deleteOriginFile: false,
             filter: ( file ) => !/\.(html|css|ico)$/.test( file )
+        } ),
+        viteStaticCopy( {
+            targets: [
+                {
+                    src: 'dist/assets/css/index.css',
+                    dest: 'assets/css'
+                },
+                {
+                    src: 'node_modules/ammojs3/dist/ammo.wasm.wasm',
+                    dest: 'assets/js'
+                },
+                {
+                    src: 'node_modules/ammojs3/dist/ammo.wasm.js',
+                    dest: 'assets/js'
+                }
+            ]
         } )
     ],
     build: {
