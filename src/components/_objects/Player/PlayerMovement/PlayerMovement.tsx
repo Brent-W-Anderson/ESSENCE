@@ -1,9 +1,9 @@
 import { Component, createEffect, onMount } from 'solid-js'
 import * as THREE from 'three'
-import { useSceneContext } from '@/components/_Scene/SceneContext'
 import { SetupMouseHandlers } from './mouseHandlers'
 import { usePlayerMovementContext } from './PlayerMovementContext'
 import PlayerMovementPointer from './PlayerMovementPointer'
+import { useSceneContext } from '@/components/_Scene/SceneContext'
 
 const playerMovementSpeed = 12
 const playerRotationSpeed = 0.15

@@ -1,6 +1,6 @@
 import { SettingsIcon } from '@/assets/icons'
 
-const NAV={
+const NAV = {
     HOME: 'HOME',
     SETTINGS: SettingsIcon
 }
