@@ -5,29 +5,39 @@ const prettierPlugin = require('eslint-plugin-prettier')
 const solidPlugin = require('eslint-plugin-solid')
 
 module.exports = {
-    files: ['src/**/*.{js,mjs,cjs,jsx,ts,tsx}'],
+    files: [
+        'frontend/src/**/*.{js,mjs,cjs,jsx,ts,tsx}',
+        'backend/src/**/*.{js,mjs,cjs,jsx,ts,tsx}'
+    ],
     ignores: ['dist/', 'node_modules/', '**/*.scss.d.ts'],
     languageOptions: {
         parser: typescriptParser,
         ecmaVersion: 2020,
-        sourceType: 'module',
+        sourceType: 'module'
     },
     plugins: {
         '@typescript-eslint': typescriptEslintPlugin,
-        'import': importPlugin,
-        'prettier': prettierPlugin,
-        'solid': solidPlugin
+        import: importPlugin,
+        prettier: prettierPlugin,
+        solid: solidPlugin
     },
     rules: {
         '@typescript-eslint/no-unused-vars': 'warn',
         'import/order': [
             'warn',
             {
-                'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+                groups: [
+                    'builtin',
+                    'external',
+                    'internal',
+                    'parent',
+                    'sibling',
+                    'index'
+                ],
                 'newlines-between': 'never',
-                'alphabetize': { 'order': 'asc', 'caseInsensitive': true }
+                alphabetize: { order: 'asc', caseInsensitive: true }
             }
         ],
-        'prettier/prettier': 'error',
-    },
+        'prettier/prettier': 'error'
+    }
 }
