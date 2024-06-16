@@ -32,11 +32,11 @@ export default defineConfig( {
                     dest: 'assets/css'
                 },
                 {
-                    src: 'node_modules/ammojs3/dist/ammo.wasm.wasm',
+                    src: '../node_modules/ammojs3/dist/ammo.wasm.wasm',
                     dest: 'assets/js'
                 },
                 {
-                    src: 'node_modules/ammojs3/dist/ammo.wasm.js',
+                    src: '../node_modules/ammojs3/dist/ammo.wasm.js',
                     dest: 'assets/js'
                 }
             ]

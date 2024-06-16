@@ -5,16 +5,19 @@
         "backend"
     ],
     "scripts": {
+        "start": "cd frontend/ && yarn start && cd ../",
+        "build": "cd frontend/ && yarn build && cd ../",
         "lint": "concurrently \"yarn lint:js\" \"yarn lint:styles\"",
         "lint:fix": "concurrently \"yarn lint:js:fix\" \"yarn lint:styles:fix\"",
-        "lint:js": "eslint **/src/**/*.{js,jsx,ts,tsx} --config .eslintrc.config.cjs",
-        "lint:js:fix": "eslint **/src/**/*.{js,jsx,ts,tsx} --fix --config .eslintrc.config.cjs",
-        "lint:styles": "stylelint **/src/**/*.scss --config .stylelintrc",
-        "lint:styles:fix": "stylelint **/src/**/*.scss --fix --config .stylelintrc"
+        "lint:js": "eslint \"frontend/src/**/*.{js,jsx,ts,tsx}\" --config .eslintrc.config.cjs",
+        "lint:js:fix": "eslint \"frontend/src/**/*.{js,jsx,ts,tsx}\" --fix --config .eslintrc.config.cjs",
+        "lint:styles": "stylelint \"frontend/src/**/*.scss\" --config .stylelintrc",
+        "lint:styles:fix": "stylelint \"frontend/src/**/*.scss\" --fix --config .stylelintrc"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^7.13.0",
         "@typescript-eslint/parser": "^7.13.0",
+        "concurrently": "^8.2.2",
         "eslint": "^9.5.0",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-import": "^2.29.1",
@@ -23,7 +26,7 @@
         "prettier": "^3.3.2",
         "stylelint": "^16.6.1",
         "stylelint-config-standard-scss": "^13.1.0",
-        "concurrently": "^8.2.2",
         "typescript": "^5.4.5"
-    }
+    },
+    "packageManager": "yarn@4.3.0"
 }
