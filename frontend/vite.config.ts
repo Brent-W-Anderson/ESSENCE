@@ -16,7 +16,7 @@ export default defineConfig( {
             template: './src/index.html'
         } ),
         visualizer( {
-            filename: './dist/stats.html',
+            filename: '../dist/frontend/stats.html',
             open: false,
         } ),
         viteCompression( {
@@ -28,7 +28,7 @@ export default defineConfig( {
         viteStaticCopy( {
             targets: [
                 {
-                    src: 'dist/assets/css/index.css',
+                    src: '../dist/frontend/assets/css/index.css',
                     dest: 'assets/css'
                 },
                 {
@@ -44,7 +44,8 @@ export default defineConfig( {
     ],
     build: {
         target: 'esnext',
-        outDir: 'dist',
+        outDir: '../dist/frontend',
+        emptyOutDir: true,
         assetsDir: './',
         sourcemap: false,
         rollupOptions: {

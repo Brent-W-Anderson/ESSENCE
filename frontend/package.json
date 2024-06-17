@@ -5,7 +5,7 @@
     "scripts": {
         "start": "yarn build:css && npx concurrently \"yarn vite\" \"yarn generate:scss-types\"",
         "build": "vite build && yarn build:css",
-        "build:css": "sass --no-source-map \"src/index.scss\" \"dist/assets/css/index.css\"",
+        "build:css": "sass --no-source-map \"src/index.scss\" \"../dist/frontend/assets/css/index.css\"",
         "generate:scss-types": "typed-scss-modules \"src/**/*.module.scss\" --exportType default --nameFormat none -w"
     },
     "dependencies": {
