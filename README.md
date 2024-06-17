@@ -29,9 +29,3 @@
 #### - split up PlayerMovement component more, so it's easier to read.
 
 #### - disable ray lines at the height of a jump, since velocity is 0 (bug when jumping up to a ledge and ray lines re-adjust). -- possibly keep this for grabbing ledges...
-
-## BACKEND
-
-### TODO:
-
-#### - setup Node/Express backend server to handle serving the .gz compressed files.

@@ -5,14 +5,17 @@
         "backend"
     ],
     "scripts": {
-        "start": "cd frontend/ && yarn start && cd ../",
-        "build": "cd frontend/ && yarn build && cd ../",
+        "dev": "yarn workspace frontend start",
+        "start": "yarn workspace backend dev",
+        "build": "yarn build:frontend && yarn build:backend",
+        "build:frontend": "cd frontend/ && yarn build && cd ../",
+        "build:backend": "cp \"backend/server.js\" \"dist/server.js\"",
         "lint": "concurrently \"yarn lint:js\" \"yarn lint:styles\"",
         "lint:fix": "concurrently \"yarn lint:js:fix\" \"yarn lint:styles:fix\"",
-        "lint:js": "eslint \"frontend/src/**/*.{js,jsx,ts,tsx}\" --config .eslintrc.config.cjs",
-        "lint:js:fix": "eslint \"frontend/src/**/*.{js,jsx,ts,tsx}\" --fix --config .eslintrc.config.cjs",
-        "lint:styles": "stylelint \"frontend/src/**/*.scss\" --config .stylelintrc",
-        "lint:styles:fix": "stylelint \"frontend/src/**/*.scss\" --fix --config .stylelintrc"
+        "lint:js": "eslint \"frontend/**/*.{js,jsx,ts,tsx}\"  \"backend/**/*.{js,jsx,ts,tsx}\" --config .eslintrc.config.cjs",
+        "lint:js:fix": "eslint \"frontend/**/*.{js,jsx,ts,tsx}\"  \"backend/**/*.{js,jsx,ts,tsx}\" --fix --config .eslintrc.config.cjs",
+        "lint:styles": "stylelint \"frontend/**/*.scss\" \"backend/**/*.scss\" --config .stylelintrc",
+        "lint:styles:fix": "stylelint \"frontend/**/*.scss\" \"backend/**/*.scss\" --fix --config .stylelintrc"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^7.13.0",
