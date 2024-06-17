@@ -35,6 +35,18 @@ const SceneContext = createContext<{
     setPlayerRef?: Setter<THREE.Group | THREE.Mesh | undefined>
     floorRef?: Accessor<THREE.Mesh | undefined>
     setFloorRef?: Setter<THREE.Mesh | undefined>
+    objectsRef?: Accessor<
+        {
+            index: number
+            mesh: THREE.Mesh
+        }[]
+    >
+    setObjectsRef?: Setter<
+        {
+            index: number
+            mesh: THREE.Mesh
+        }[]
+    >
 }>()
 
 const [physicsWorld, setPhysicsWorld] =
@@ -44,6 +56,9 @@ const [rigidPlayerRef, setRigidPlayerRef] =
     createSignal<Window['Ammo']['btRigidBody']>()
 const [playerRef, setPlayerRef] = createSignal<THREE.Group | THREE.Mesh>()
 const [floorRef, setFloorRef] = createSignal<THREE.Mesh>()
+const [objectsRef, setObjectsRef] = createSignal<
+    { index: number; mesh: THREE.Mesh }[]
+>([])
 
 const SceneProvider: Component<{
     children: JSX.Element | JSX.Element[]
@@ -205,7 +220,9 @@ const SceneProvider: Component<{
         playerRef,
         setPlayerRef,
         floorRef,
-        setFloorRef
+        setFloorRef,
+        objectsRef,
+        setObjectsRef
     }
 
     return (

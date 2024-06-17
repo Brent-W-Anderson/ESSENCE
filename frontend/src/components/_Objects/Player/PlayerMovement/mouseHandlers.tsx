@@ -27,12 +27,9 @@ export const SetupMouseHandlers: Component = () => {
 
         const raycaster = new THREE.Raycaster()
         raycaster.setFromCamera(mouseVec, camera!)
-        const intersects = raycaster.intersectObjects(scene!.children)
 
         if (isRightClickHeldRef.current) {
             renderer!.domElement.style.cursor = 'grabbing'
-        } else if (intersects.length > 0) {
-            renderer!.domElement.style.cursor = 'pointer'
         } else {
             renderer!.domElement.style.cursor = 'default'
         }

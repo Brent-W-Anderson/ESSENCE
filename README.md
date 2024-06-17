@@ -4,13 +4,11 @@
 
 ### TODO:
 
-#### - AxisArrows + coordinates should be larger if they're further from the camera (zooming in-or-out should also decrease/increase font-size).
-
 #### - allow AxisArrows to drag objects around the scene.
 
 #### - zooming in should look at the top of the player, not the center.
 
-#### - add settings for individual objects (on hover - shows available object settings) vs global settings on the cogwheel.
+#### - AxisArrows + coordinates should be larger if they're further from the camera (zooming in-or-out should also decrease/increase font-size).
 
 #### - split up PlayerMovement component more. -- start with key-bindings, since mouse-bindings are done.
 

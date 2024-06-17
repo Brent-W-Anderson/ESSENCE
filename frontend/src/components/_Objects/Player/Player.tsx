@@ -1,11 +1,11 @@
 import { Component, onMount } from 'solid-js'
 import * as THREE from 'three'
+import AxisArrows from '@/components/_Helpers/AxisArrows'
 import { useSceneContext } from '@/components/_Scene/SceneContext'
 
 const Player: Component<{
-    useGravity?: boolean
     initialPosition?: { x: number; y: number; z: number }
-}> = ({ useGravity = false, initialPosition = { x: 0, y: 0, z: 0 } }) => {
+}> = ({ initialPosition = { x: 0, y: 0, z: 0 } }) => {
     const context = useSceneContext()
     if (!context) return null
 
@@ -59,15 +59,12 @@ const Player: Component<{
             depth: radius
         })
 
-        if (useGravity) {
-            rigidBody && physicsWorld && physicsWorld()?.addRigidBody(rigidBody)
-            rigidBody.setAngularFactor(new ammo.btVector3(0, 0, 0))
-            rigidBody.setRestitution(1)
-            rigidBody.setFriction(1)
+        rigidBody && physicsWorld && physicsWorld()?.addRigidBody(rigidBody)
+        rigidBody.setAngularFactor(new ammo.btVector3(0, 0, 0))
+        rigidBody.setRestitution(1)
+        rigidBody.setFriction(1)
 
-            updateMesh(group, rigidBody)
-        }
-
+        updateMesh(group, rigidBody)
         setRigidPlayerRef!(rigidBody)
         setPlayerRef!(group)
 
@@ -75,12 +72,18 @@ const Player: Component<{
             scene.remove(group)
             rigidBody &&
                 physicsWorld &&
-                useGravity &&
                 physicsWorld()?.removeRigidBody(rigidBody)
         }
     })
 
-    return null
+    return (
+        <AxisArrows
+            mesh={group}
+            rigidHalfHeight={3}
+            alwaysVisible
+            showArrows={false}
+        />
+    )
 }
 
 export default Player
