@@ -1,34 +1,64 @@
-import { Component, createEffect } from 'solid-js'
+import { Component, createEffect, onCleanup } from 'solid-js'
 import * as THREE from 'three'
 
-interface PointerProps {
+const ringColor = 0x00ff00
+const ringThickness = 0.05
+const outerRadius = 0.4
+const segments = 32
+
+const PlayerMovementPointer: Component<{
     scene: THREE.Scene
     onPointerCreated: (object: THREE.Mesh) => void
-}
-
-const PlayerMovementPointer: Component<PointerProps> = ({
-    scene,
-    onPointerCreated
-}) => {
-    const height = 6
-    const pointerGeometry = new THREE.CylinderGeometry(0.05, 0.05, height, 32)
-    pointerGeometry.translate(0, height / 2, 0)
-    const pointerMaterial = new THREE.MeshPhongMaterial({
-        color: 0xff0000,
-        emissive: 0xff0000,
-        emissiveIntensity: 1,
+}> = ({ scene, onPointerCreated }) => {
+    const pointerGeometry = new THREE.RingGeometry(
+        outerRadius - ringThickness,
+        outerRadius,
+        segments
+    )
+    const pointerMaterial = new THREE.MeshBasicMaterial({
+        color: ringColor,
         transparent: true,
-        opacity: 0.7
+        opacity: 1
     })
     const pointer = new THREE.Mesh(pointerGeometry, pointerMaterial)
+    pointer.rotation.x = -Math.PI / 2
+    pointer.visible = false
+
+    let scale = 1
+    let opacity = 1
+    let growing = true
+    let animationFrameId: number
+
+    const animatePointer = () => {
+        if (growing) {
+            scale += 0.02
+            opacity -= 0.02
+            if (scale >= 2) {
+                growing = false
+            }
+        } else {
+            scale = 1
+            opacity = 1
+            growing = true
+        }
+
+        pointer.scale.set(scale, scale, scale)
+        pointer.material.opacity = opacity
+
+        animationFrameId = requestAnimationFrame(animatePointer)
+    }
 
     createEffect(() => {
         scene.add(pointer)
         onPointerCreated(pointer)
 
-        return () => {
+        // Start the animation loop
+        animatePointer()
+
+        onCleanup(() => {
             scene.remove(pointer)
-        }
+            cancelAnimationFrame(animationFrameId)
+        })
     })
 
     return null

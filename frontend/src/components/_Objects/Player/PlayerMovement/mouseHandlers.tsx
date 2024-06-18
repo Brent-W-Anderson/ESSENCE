@@ -57,7 +57,7 @@ export const SetupMouseHandlers: Component = () => {
             if (intersectPoint.y <= boundingBox.max.y) {
                 targetPos.set(
                     intersectPoint.x,
-                    intersectPoint.y,
+                    intersectPoint.y + 0.1,
                     intersectPoint.z
                 )
             }
