@@ -6,11 +6,11 @@ import PlayerMovementPointer from './PlayerMovementPointer'
 import { useSceneContext } from '@/components/_Scene/SceneContext'
 
 const movementIndicatorThreshold = 1000 // 1 second
-const canJumpWithRayLinesThreshold = 100 // 1/10th second
+const canJumpWithRayLinesThreshold = 50 // 1/10th second
 const playerMovementSpeed = 12
 const playerRotationSpeed = 0.15
 const jumpForce = 20
-const fallVelocityTolerance = 0.1 // not sure if this is that important?
+const fallVelocityTolerance = 0.1
 const showRayLines = true
 const stepHeight = 0.4
 
@@ -305,8 +305,6 @@ const PlayerMovement: Component = () => {
                 rigidPlayer.activate()
                 ammo.destroy(jumpVelocity)
             }
-
-            isJumping = false
         }
     }
 
@@ -399,6 +397,8 @@ const PlayerMovement: Component = () => {
             origin.y() < calculateAmmoHeight(4) - 0.1 // tolerance
         ) {
             ammo.destroy(transform)
+            isJumping = false
+
             return // Skip ledge detection if the player is in the air or below -0.1
         }
 
