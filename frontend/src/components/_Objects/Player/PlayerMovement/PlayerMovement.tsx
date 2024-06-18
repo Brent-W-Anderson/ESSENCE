@@ -40,10 +40,13 @@ const PlayerMovement: Component = () => {
     let movementTimeout: number | null = null
     let canJumpTimeout: number | null = null
     let canJump = true
+    let lastJumpPressTime = 0
 
     const onKeyDown = (event: KeyboardEvent) => {
-        if (event.key === ' ' && !isJumping) {
+        const currentTime = Date.now()
+        if (event.key === ' ' && currentTime - lastJumpPressTime > 800) {
             isJumping = true
+            lastJumpPressTime = currentTime
         }
 
         if (event.key === 'w') {
@@ -304,6 +307,7 @@ const PlayerMovement: Component = () => {
                 rigidPlayer!.setLinearVelocity(jumpVelocity)
                 rigidPlayer.activate()
                 ammo.destroy(jumpVelocity)
+                isJumping = false
             }
         }
     }
@@ -397,8 +401,6 @@ const PlayerMovement: Component = () => {
             origin.y() < calculateAmmoHeight(4) - 0.1 // tolerance
         ) {
             ammo.destroy(transform)
-            isJumping = false
-
             return // Skip ledge detection if the player is in the air or below -0.1
         }
 

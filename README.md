@@ -4,8 +4,6 @@
 
 ### TODO:
 
-#### - fix bug where you can sometimes double jump in the air (not sure why this is happening...).
-
 #### - allow jumping in the middle of a ledge bump.
 
 #### - add queueing a jump if space-bar is pressed in the middle of a jump.
