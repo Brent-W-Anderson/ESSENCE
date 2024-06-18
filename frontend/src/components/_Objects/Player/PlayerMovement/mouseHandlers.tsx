@@ -9,7 +9,7 @@ export const SetupMouseHandlers: Component = () => {
 
     if (!context || !movementContext) return
 
-    const { scene, camera, renderer, playerRef } = context
+    const { scene, camera, renderer } = context
     const {
         mouse: [mouse, setMouse],
         pointer: [pointer],
@@ -41,23 +41,26 @@ export const SetupMouseHandlers: Component = () => {
         const raycaster = new THREE.Raycaster()
         raycaster.setFromCamera(mouse(), camera)
 
-        const objectsToIntersect = scene!.children.filter(
-            obj => obj !== playerRef!()
+        const meshChildren = scene!.children.filter(
+            child => child instanceof THREE.Mesh
         )
-        const intersects = raycaster.intersectObjects(objectsToIntersect)
+        const intersects = raycaster.intersectObjects(meshChildren, true)
 
         if (intersects.length > 0) {
             const intersectedObject = intersects[0].object
+            const intersectPoint = intersects[0].point
+
             const boundingBox = new THREE.Box3().setFromObject(
                 intersectedObject
             )
-            const highestPoint = boundingBox.max
 
-            targetPos.set(
-                intersects[0].point.x,
-                highestPoint.y,
-                intersects[0].point.z
-            )
+            if (intersectPoint.y <= boundingBox.max.y) {
+                targetPos.set(
+                    intersectPoint.x,
+                    intersectPoint.y,
+                    intersectPoint.z
+                )
+            }
         } else {
             targetPos.set(0, 0, 0)
         }

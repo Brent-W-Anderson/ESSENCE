@@ -12,8 +12,6 @@
 
 #### - split up PlayerMovement component more. -- start with key-bindings, since mouse-bindings are done.
 
-#### - PlayerMovementPointer sometimes shows up a lot higher than it should (I think it's registering the AxisArrows, player, and possibly the ray lines).
-
 #### - don't let the bumper lines continuously keep jumping if in range and no volicity in the z/x direction (jumping up and down continuously over ledge).
 
 #### - when clicking a targeted location add a delay before moving to register the click (if click is being held, only delay initially).

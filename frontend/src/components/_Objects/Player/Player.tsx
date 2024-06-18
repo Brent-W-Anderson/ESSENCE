@@ -20,7 +20,6 @@ const Player: Component<{
     } = context
     const ammo = AmmoLib()
     const group = new THREE.Group()
-    group.name = 'Player'
 
     onMount(() => {
         const radius = 1
