@@ -4,8 +4,6 @@
 
 ### TODO:
 
-#### - fix bug where player can't jump with spacebar if he's been standing still for too long.
-
 #### - allow AxisArrows to drag objects around the scene.
 
 #### - zooming in should look at the top of the player, not the center.

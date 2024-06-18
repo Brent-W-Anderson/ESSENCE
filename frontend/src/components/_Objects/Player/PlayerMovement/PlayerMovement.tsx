@@ -295,6 +295,7 @@ const PlayerMovement: Component = () => {
                     currentVelocity.z()
                 )
                 rigidPlayer!.setLinearVelocity(jumpVelocity)
+                rigidPlayer.activate()
                 ammo.destroy(jumpVelocity)
             }
 
