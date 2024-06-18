@@ -1,20 +1,18 @@
 import { Component, onMount } from 'solid-js'
-import * as THREE from 'three'
-import AxisArrows from '../_Helpers/AxisArrows'
-import { useSceneContext } from '@/components/_Scene/SceneContext'
+import { BoxGeometry, Mesh, MeshStandardMaterial } from 'three'
+import AxisArrows from './Helpers/AxisArrows'
+import { useSceneContext } from '@/components/_Scene/Context'
 
 const Cube: Component<{
     index: number
     scale: { h: number; w: number; d: number }
     initialPosition: { x: number; y: number; z: number }
 }> = ({ index, scale, initialPosition }) => {
-    const context = useSceneContext()
-    if (!context) return null
-
+    const context = useSceneContext()!
     const { scene, physicsWorld, createRigidBody, setObjectsRef } = context
-    const geometry = new THREE.BoxGeometry(scale.w, scale.h, scale.d)
-    const material = new THREE.MeshStandardMaterial({ color: 0x0000cc })
-    const cube = new THREE.Mesh(geometry, material)
+    const geometry = new BoxGeometry(scale.w, scale.h, scale.d)
+    const material = new MeshStandardMaterial({ color: 0x0000cc })
+    const cube = new Mesh(geometry, material)
 
     onMount(() => {
         cube.receiveShadow = true
@@ -25,7 +23,7 @@ const Cube: Component<{
             initialPosition.z
         )
 
-        setObjectsRef!((prev: { index: number; mesh: THREE.Mesh }[]) => [
+        setObjectsRef!((prev: { index: number; mesh: Mesh }[]) => [
             ...prev,
             { index, mesh: cube }
         ])

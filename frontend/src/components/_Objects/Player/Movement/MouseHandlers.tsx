@@ -1,13 +1,14 @@
 import { Component, onCleanup } from 'solid-js'
-import * as THREE from 'three'
-import { usePlayerMovementContext } from './PlayerMovementContext'
-import { useSceneContext } from '@/components/_Scene/SceneContext'
+import { Box3, Mesh, Raycaster, Vector2 } from 'three'
+import { usePlayerMovementContext } from './Context'
+import { useSceneContext } from '@/components/_Scene/Context'
 
-export const SetupMouseHandlers: Component = () => {
-    const context = useSceneContext()
-    const movementContext = usePlayerMovementContext()
+// TODO: add applyMovementForce() & applyRotation() to the MouseHanglers,
+// since this belongs with the mouse logic.
 
-    if (!context || !movementContext) return
+export const MouseHandlers: Component = () => {
+    const context = useSceneContext()!
+    const movementContext = usePlayerMovementContext()!
 
     const { scene, camera, renderer } = context
     const {
@@ -19,13 +20,13 @@ export const SetupMouseHandlers: Component = () => {
     } = movementContext
 
     const updateMousePosition = (event: MouseEvent) => {
-        const mouseVec = new THREE.Vector2(
+        const mouseVec = new Vector2(
             (event.clientX / window.innerWidth) * 2 - 1,
             -(event.clientY / window.innerHeight) * 2 + 1
         )
         setMouse(mouseVec)
 
-        const raycaster = new THREE.Raycaster()
+        const raycaster = new Raycaster()
         raycaster.setFromCamera(mouseVec, camera!)
 
         if (isRightClickHeldRef.current) {
@@ -38,11 +39,11 @@ export const SetupMouseHandlers: Component = () => {
     const updateTargetPosition = () => {
         if (!camera) return
 
-        const raycaster = new THREE.Raycaster()
+        const raycaster = new Raycaster()
         raycaster.setFromCamera(mouse(), camera)
 
         const meshChildren = scene!.children.filter(
-            child => child instanceof THREE.Mesh
+            child => child instanceof Mesh
         )
         const intersects = raycaster.intersectObjects(meshChildren, true)
 
@@ -50,9 +51,7 @@ export const SetupMouseHandlers: Component = () => {
             const intersectedObject = intersects[0].object
             const intersectPoint = intersects[0].point
 
-            const boundingBox = new THREE.Box3().setFromObject(
-                intersectedObject
-            )
+            const boundingBox = new Box3().setFromObject(intersectedObject)
 
             if (intersectPoint.y <= boundingBox.max.y) {
                 targetPos.set(
@@ -120,5 +119,5 @@ export const SetupMouseHandlers: Component = () => {
         }
     })
 
-    return null
+    return pointer() && null
 }

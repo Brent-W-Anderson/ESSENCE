@@ -1,36 +1,23 @@
 import { createEffect, onCleanup, Component } from 'solid-js'
-import * as THREE from 'three'
+import { MOUSE, Vector3 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { useSceneContext } from '@/components/_Scene/SceneContext'
-
-const floatPolarAngle = false
-const floatAzimuthAngle = false
-const cameraFloatEasing = 0.1
-
-let currentPolarAngle = 1
-let currentAzimuthAngle = 0
-
-const arrowKeyRotationSensitivity = 0.02
-const mouseRotationSensitivity = 0.003
-
-const keysPressed: { [key: string]: { pressed: boolean; speed: number } } = {
-    ArrowUp: { pressed: false, speed: 0.01 },
-    ArrowLeft: { pressed: false, speed: arrowKeyRotationSensitivity },
-    ArrowDown: { pressed: false, speed: 0.01 },
-    ArrowRight: { pressed: false, speed: arrowKeyRotationSensitivity }
-}
+import { useSceneContext } from '@/components/_Scene/Context'
+import { PLAYER } from '@/config'
 
 const PlayerCamera: Component = () => {
-    const context = useSceneContext()
-    if (!context) return null
-
-    const { playerRef } = context
-    const player = playerRef?.() as THREE.Object3D
-
-    if (!player) return null
-
+    const context = useSceneContext()!
+    const player = context.playerRef!()!
     const { scene, camera, renderer } = context
     const controls = new OrbitControls(camera, renderer.domElement)
+    const {
+        floatPolarAngle,
+        floatAzimuthAngle,
+        cameraFloatEasing,
+        arrowKeyRotationSensitivity,
+        mouseRotationSensitivity
+    } = PLAYER.CAMERA
+    let { currentPolarAngle, currentAzimuthAngle } = PLAYER.CAMERA
+
     let targetDistance = 5
     let isUserInteracting = false
     let mouseDown = false
@@ -59,9 +46,17 @@ const PlayerCamera: Component = () => {
     controls.target.copy(player.position)
     controls.mouseButtons = {
         LEFT: null,
-        RIGHT: THREE.MOUSE.ROTATE
+        RIGHT: MOUSE.ROTATE
     }
     controls.update()
+
+    const keysPressed: { [key: string]: { pressed: boolean; speed: number } } =
+        {
+            ArrowUp: { pressed: false, speed: 0.01 },
+            ArrowLeft: { pressed: false, speed: arrowKeyRotationSensitivity },
+            ArrowDown: { pressed: false, speed: 0.01 },
+            ArrowRight: { pressed: false, speed: arrowKeyRotationSensitivity }
+        }
 
     const handleMouseDown = (event: MouseEvent) => {
         if (event.button === 2) {
@@ -161,7 +156,7 @@ const PlayerCamera: Component = () => {
 
         if (isUserInteracting) {
             // Skip updating angles based on keyboard if the user is interacting with the mouse
-            const direction = new THREE.Vector3()
+            const direction = new Vector3()
                 .copy(camera.position)
                 .sub(player.position)
                 .normalize()
@@ -186,12 +181,12 @@ const PlayerCamera: Component = () => {
             }
 
             // When not interacting, smoothly move the camera to the target position
-            const direction = new THREE.Vector3()
+            const direction = new Vector3()
                 .copy(camera.position)
                 .sub(player.position)
                 .normalize()
 
-            let newCameraPosition = new THREE.Vector3()
+            let newCameraPosition = new Vector3()
                 .copy(player.position)
                 .addScaledVector(direction, targetDistance)
 

@@ -1,15 +1,12 @@
 import { createEffect, Component, JSX } from 'solid-js'
-import { useSceneContext } from './SceneContext'
+import { useSceneContext } from './Context'
 
 type RendererProps = {
     children?: JSX.Element | JSX.Element[]
 }
 
 const Renderer: Component<RendererProps> = ({ children }) => {
-    const context = useSceneContext()
-    if (!context) return
-
-    const { scene, camera, renderer } = context
+    const { scene, camera, renderer } = useSceneContext()!
 
     createEffect(() => {
         renderer.shadowMap.enabled = true

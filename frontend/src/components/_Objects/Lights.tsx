@@ -1,15 +1,10 @@
 import { createEffect, Component, createSignal } from 'solid-js'
-import * as THREE from 'three'
-import { useSceneContext } from './SceneContext'
+import { AmbientLight, DirectionalLight, Vector3 } from 'three'
+import { useSceneContext } from '../_Scene/Context'
 
 const Lights: Component = () => {
-    const context = useSceneContext()
-    if (!context) return
-
-    const { scene } = context
-
+    const { scene } = useSceneContext()!
     const [time, setTime] = createSignal(0)
-
     const updateLightPosition = (time: number) => {
         const radius = 100
         const speed = 1 / 100000
@@ -19,7 +14,7 @@ const Lights: Component = () => {
         const y = radius * Math.cos(angle) + 150
         const z = radius * Math.sin(angle)
 
-        return new THREE.Vector3(x, y, z)
+        return new Vector3(x, y, z)
     }
 
     const animateLight = () => {
@@ -28,9 +23,9 @@ const Lights: Component = () => {
     }
 
     createEffect(() => {
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+        const ambientLight = new AmbientLight(0xffffff, 0.5)
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+        const directionalLight = new DirectionalLight(0xffffff, 1)
         directionalLight.castShadow = true
 
         // Adjust the shadow camera properties to cover a larger area
@@ -63,9 +58,9 @@ const Lights: Component = () => {
         const position = updateLightPosition(time())
 
         scene.children
-            .filter(child => child instanceof THREE.DirectionalLight)
+            .filter(child => child instanceof DirectionalLight)
             .forEach(child => {
-                const light = child as THREE.DirectionalLight
+                const light = child as DirectionalLight
                 light.position.copy(position)
             })
     })

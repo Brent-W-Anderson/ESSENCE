@@ -1,26 +1,30 @@
+import { useSceneContext } from '@/components/_Scene/Context'
 import { Component, createEffect, onCleanup } from 'solid-js'
-import * as THREE from 'three'
+import { Mesh, MeshBasicMaterial, RingGeometry, Scene } from 'three'
+import { usePlayerMovementContext } from './Context'
+import { PLAYER } from '@/config'
 
-const ringColor = 0x00ff00
-const ringThickness = 0.05
-const outerRadius = 0.4
-const segments = 32
+const PlayerMovementIndicator: Component = () => {
+    const context = useSceneContext()!
+    const movementContext = usePlayerMovementContext()!
+    const { ringColor, ringThickness, outerRadius, segments } =
+        PLAYER.MOVEMENT.INDICATOR
 
-const PlayerMovementPointer: Component<{
-    scene: THREE.Scene
-    onPointerCreated: (object: THREE.Mesh) => void
-}> = ({ scene, onPointerCreated }) => {
-    const pointerGeometry = new THREE.RingGeometry(
+    const {
+        pointer: [, setPointer]
+    } = movementContext
+
+    const pointerGeometry = new RingGeometry(
         outerRadius - ringThickness,
         outerRadius,
         segments
     )
-    const pointerMaterial = new THREE.MeshBasicMaterial({
+    const pointerMaterial = new MeshBasicMaterial({
         color: ringColor,
         transparent: true,
         opacity: 1
     })
-    const pointer = new THREE.Mesh(pointerGeometry, pointerMaterial)
+    const pointer = new Mesh(pointerGeometry, pointerMaterial)
     pointer.rotation.x = -Math.PI / 2
     pointer.visible = false
 
@@ -49,14 +53,14 @@ const PlayerMovementPointer: Component<{
     }
 
     createEffect(() => {
-        scene.add(pointer)
-        onPointerCreated(pointer)
+        context.scene.add(pointer)
+        setPointer(pointer)
 
         // Start the animation loop
         animatePointer()
 
         onCleanup(() => {
-            scene.remove(pointer)
+            context.scene.remove(pointer)
             cancelAnimationFrame(animationFrameId)
         })
     })
@@ -64,4 +68,4 @@ const PlayerMovementPointer: Component<{
     return null
 }
 
-export default PlayerMovementPointer
+export default PlayerMovementIndicator

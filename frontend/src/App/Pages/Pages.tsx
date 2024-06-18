@@ -3,8 +3,8 @@ import { lazy, Suspense } from 'solid-js'
 import style from './Pages.module.scss'
 import COPY from '@/assets/COPY'
 
-const HomePage = lazy(() => import('./HomePage/HomePage'))
-const SceneProvider = lazy(() => import('@/components/_Scene/SceneContext'))
+const HomePage = lazy(() => import('./Home/Home'))
+const SceneProvider = lazy(() => import('@/components/_Scene/Context'))
 
 const { HOME } = COPY.ROUTE
 

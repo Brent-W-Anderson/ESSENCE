@@ -85,6 +85,7 @@ export default defineConfig( {
     resolve: {
         alias: {
             '@': path.resolve( __dirname, 'src' ),
+            '@/config': path.resolve( __dirname, 'config.ts' ),
             fs: 'empty-module',
             path: 'empty-module'
         }

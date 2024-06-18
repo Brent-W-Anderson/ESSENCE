@@ -1,23 +1,19 @@
-import { Component, JSX, onMount } from 'solid-js'
-import * as THREE from 'three'
-import { useSceneContext } from '@/components/_Scene/SceneContext'
+import { Component, onMount } from 'solid-js'
+import { BoxGeometry, Mesh, MeshStandardMaterial, PlaneGeometry } from 'three'
+import { useSceneContext } from '@/components/_Scene/Context'
 
-const Floor: Component<{ children: JSX.Element | JSX.Element[] }> = props => {
-    const context = useSceneContext()
-    if (!context) return null
-
-    const { scene, physicsWorld, createRigidBody, floorRef, setFloorRef } =
-        context
-
-    let floor: THREE.Mesh | null = null
+const Floor: Component = () => {
+    const { scene, physicsWorld, createRigidBody, setFloorRef } =
+        useSceneContext()!
+    let floor: Mesh | null = null
 
     onMount(() => {
-        const floorGeometry = new THREE.PlaneGeometry(40, 40)
-        const floorMaterial = new THREE.MeshStandardMaterial({
+        const floorGeometry = new PlaneGeometry(40, 40)
+        const floorMaterial = new MeshStandardMaterial({
             color: 0xcccccc
         })
 
-        floor = new THREE.Mesh(floorGeometry, floorMaterial)
+        floor = new Mesh(floorGeometry, floorMaterial)
         floor.rotation.x = -Math.PI / 2
         floor.receiveShadow = true
 
@@ -40,12 +36,12 @@ const Floor: Component<{ children: JSX.Element | JSX.Element[] }> = props => {
             y: number,
             z: number
         ) => {
-            const wallGeometry = new THREE.BoxGeometry(width, height, depth)
-            const wallMaterial = new THREE.MeshStandardMaterial({
+            const wallGeometry = new BoxGeometry(width, height, depth)
+            const wallMaterial = new MeshStandardMaterial({
                 color: 0x333333
             })
 
-            const wall = new THREE.Mesh(wallGeometry, wallMaterial)
+            const wall = new Mesh(wallGeometry, wallMaterial)
             wall.position.set(x, y, z)
             wall.receiveShadow = true
             wall.castShadow = true
@@ -115,7 +111,7 @@ const Floor: Component<{ children: JSX.Element | JSX.Element[] }> = props => {
         }
     })
 
-    return <>{floorRef!() && props.children}</>
+    return null
 }
 
 export default Floor

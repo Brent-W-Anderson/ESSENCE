@@ -5,27 +5,8 @@ import {
     Component,
     JSX
 } from 'solid-js'
-import * as THREE from 'three'
-
-export interface PlayerMovementContextProps {
-    mouse: [() => THREE.Vector2, (value: THREE.Vector2) => void]
-    pointer: [
-        () => THREE.Object3D | null,
-        (value: THREE.Object3D | null) => void
-    ]
-    targetPos: THREE.Vector3
-    isWKeyDown: boolean
-    isAKeyDown: boolean
-    isSKeyDown: boolean
-    isDKeyDown: boolean
-    isJumping: boolean
-    jumped: boolean
-    rayLines: [() => THREE.Line[], (value: THREE.Line[]) => void]
-    intervalIdRef: { current: number | null }
-    isRightClickHeldRef: { current: boolean }
-    updateTargetPosition: () => void
-    setUpdateTargetPosition: (fn: () => void) => void
-}
+import { Line, Object3D, Vector2, Vector3 } from 'three'
+import { PlayerMovementContextProps } from './_types'
 
 const PlayerMovementContext = createContext<PlayerMovementContextProps>()
 
@@ -40,9 +21,9 @@ export const usePlayerMovementContext = () => {
 }
 
 const PlayerMovementProvider: Component<{ children: JSX.Element }> = props => {
-    const [mouse, setMouse] = createSignal(new THREE.Vector2(0, 0))
-    const [pointer, setPointer] = createSignal<THREE.Object3D | null>(null)
-    const targetPos = new THREE.Vector3()
+    const [mouse, setMouse] = createSignal(new Vector2(0, 0))
+    const [pointer, setPointer] = createSignal<Object3D | null>(null)
+    const targetPos = new Vector3()
     const intervalIdRef = { current: null as number | null }
     const isRightClickHeldRef = { current: false }
     let isWKeyDown = false
@@ -50,8 +31,13 @@ const PlayerMovementProvider: Component<{ children: JSX.Element }> = props => {
     let isSKeyDown = false
     let isDKeyDown = false
     let isJumping = false
-    let jumped = false
-    const [rayLines, setRayLines] = createSignal<THREE.Line[]>([])
+    let canJump = true
+    let lastJumpPressTime = 0
+    let lastPosition = new Vector3()
+    let movementTimeout: number | null = null
+    let canJumpTimeout: number | null = null
+
+    const [rayLines, setRayLines] = createSignal<Line[]>([])
     let updateTargetPosition = () => {}
 
     const setUpdateTargetPosition = (fn: () => void) => {
@@ -69,7 +55,11 @@ const PlayerMovementProvider: Component<{ children: JSX.Element }> = props => {
                 isSKeyDown,
                 isDKeyDown,
                 isJumping,
-                jumped,
+                canJump,
+                lastJumpPressTime,
+                lastPosition,
+                movementTimeout,
+                canJumpTimeout,
                 rayLines: [rayLines, setRayLines],
                 intervalIdRef,
                 isRightClickHeldRef,

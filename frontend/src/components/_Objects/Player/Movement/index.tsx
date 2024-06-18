@@ -1,54 +1,40 @@
 import { Component, createEffect, onMount } from 'solid-js'
-import * as THREE from 'three'
-import { SetupMouseHandlers } from './mouseHandlers'
-import { usePlayerMovementContext } from './PlayerMovementContext'
-import PlayerMovementPointer from './PlayerMovementPointer'
-import { useSceneContext } from '@/components/_Scene/SceneContext'
+import {
+    BufferGeometry,
+    Line,
+    LineBasicMaterial,
+    Quaternion,
+    Vector3
+} from 'three'
+import { MouseHandlers } from './MouseHandlers'
+import { usePlayerMovementContext } from './Context'
+import PlayerMovementIndicator from './Indicator'
+import { useSceneContext } from '@/components/_Scene/Context'
+import { PLAYER } from '@/config'
 
-const movementIndicatorThreshold = 1000
-const canJumpWithRayLinesThreshold = 50
-const jumpingThreshold = 750
-const playerMovementSpeed = 12
-const playerRotationSpeed = 0.15
-const jumpForce = 20
-const fallVelocityTolerance = 0.1
-const allowJumpClimbing = true
-const showRayLines = true
-const stepHeight = 0.4
+// TODO: split off key-bindings into their own component,
+// just like the MouseHandlers.
 
 const PlayerMovement: Component = () => {
-    const context = useSceneContext()
-    const movementContext = usePlayerMovementContext()
-
-    if (!context || !movementContext) return null
-
-    const { scene, camera, rigidPlayerRef } = context
-    const rigidPlayer = rigidPlayerRef?.()
-    if (!rigidPlayer) return
+    const context = useSceneContext()!
+    const movementContext = usePlayerMovementContext()!
+    const rigidPlayer = context.rigidPlayerRef!()
 
     const {
-        pointer: [pointer, setPointer],
         targetPos,
-        rayLines: [rayLines, setRayLines],
-        intervalIdRef
+        intervalIdRef,
+        pointer: [pointer],
+        rayLines: [rayLines, setRayLines]
     } = movementContext
-
-    let isWKeyDown = false
-    let isAKeyDown = false
-    let isSKeyDown = false
-    let isDKeyDown = false
-    let isJumping = false
-    let lastPosition = new THREE.Vector3()
-    let movementTimeout: number | null = null
-    let canJumpTimeout: number | null = null
-    let canJump = true
-    let lastJumpPressTime = 0
+    let { isJumping, canJump, lastJumpPressTime } = movementContext
+    let { isWKeyDown, isAKeyDown, isSKeyDown, isDKeyDown } = movementContext
+    let { lastPosition, movementTimeout, canJumpTimeout } = movementContext
 
     const onKeyDown = (event: KeyboardEvent) => {
         const currentTime = Date.now()
         if (
             event.key === ' ' &&
-            currentTime - lastJumpPressTime > jumpingThreshold
+            currentTime - lastJumpPressTime > PLAYER.JUMPING.jumpingThreshold
         ) {
             isJumping = true
             lastJumpPressTime = currentTime
@@ -100,12 +86,12 @@ const PlayerMovement: Component = () => {
         const transform = new ammo.btTransform()
         rigidPlayer.getMotionState().getWorldTransform(transform)
 
-        const cameraDirection = new THREE.Vector3()
-        camera.getWorldDirection(cameraDirection)
+        const cameraDirection = new Vector3()
+        context.camera.getWorldDirection(cameraDirection)
         cameraDirection.y = 0 // Ensure the player stays on the ground plane
         cameraDirection.normalize()
 
-        let direction = new THREE.Vector3()
+        let direction = new Vector3()
         if (isWKeyDown) {
             direction.add(cameraDirection)
         }
@@ -116,14 +102,14 @@ const PlayerMovement: Component = () => {
             direction.add(
                 cameraDirection
                     .clone()
-                    .applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2)
+                    .applyAxisAngle(new Vector3(0, 1, 0), Math.PI / 2)
             )
         }
         if (isDKeyDown) {
             direction.add(
                 cameraDirection
                     .clone()
-                    .applyAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2)
+                    .applyAxisAngle(new Vector3(0, 1, 0), -Math.PI / 2)
             )
         }
 
@@ -152,7 +138,7 @@ const PlayerMovement: Component = () => {
 
         direction.normalize()
 
-        const forceMagnitude = playerMovementSpeed
+        const forceMagnitude = PLAYER.MOVEMENT.movementSpeed
         const movementForce = new ammo.btVector3(
             direction.x * forceMagnitude,
             rigidPlayer.getLinearVelocity().y(),
@@ -162,7 +148,7 @@ const PlayerMovement: Component = () => {
         // Update rotation to face the movement direction smoothly
         const currentTransform = rigidPlayer.getWorldTransform()
         const currentRotation = currentTransform.getRotation()
-        const currentQuat = new THREE.Quaternion(
+        const currentQuat = new Quaternion(
             currentRotation.x(),
             currentRotation.y(),
             currentRotation.z(),
@@ -170,13 +156,13 @@ const PlayerMovement: Component = () => {
         )
 
         // Calculate the target quaternion
-        const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(
-            new THREE.Vector3(0, 0, 1), // Assuming the object's forward direction is +Z
+        const targetQuaternion = new Quaternion().setFromUnitVectors(
+            new Vector3(0, 0, 1), // Assuming the object's forward direction is +Z
             direction.clone()
         )
 
         // Interpolate between the current and target quaternion
-        currentQuat.slerp(targetQuaternion, playerRotationSpeed)
+        currentQuat.slerp(targetQuaternion, PLAYER.MOVEMENT.rotationSpeed)
 
         // Update the rigid body rotation smoothly
         currentTransform.setRotation(
@@ -196,15 +182,15 @@ const PlayerMovement: Component = () => {
         ammo.destroy(transform)
     }
 
-    const calculateDirectionToTarget = (currentPosition: THREE.Vector3) => {
-        if (targetPos.equals(new THREE.Vector3(0, 0, 0))) {
+    const calculateDirectionToTarget = (currentPosition: Vector3) => {
+        if (targetPos.equals(new Vector3(0, 0, 0))) {
             return {
-                directionToTarget: new THREE.Vector3(),
+                directionToTarget: new Vector3(),
                 distanceToTarget: 0
             }
         }
 
-        const directionToTarget = new THREE.Vector3(
+        const directionToTarget = new Vector3(
             targetPos.x - currentPosition.x,
             0,
             targetPos.z - currentPosition.z
@@ -216,26 +202,27 @@ const PlayerMovement: Component = () => {
     }
 
     const applyMovementForce = (
-        directionToTarget: THREE.Vector3,
+        directionToTarget: Vector3,
         distanceToTarget: number,
         ammo: typeof window.Ammo
     ) => {
-        let forceMagnitude = playerMovementSpeed
+        let forceMagnitude = PLAYER.MOVEMENT.movementSpeed
         let adjusted = false
 
         // prevents stutter by exponentially slowing down within for-loop.
-        const maxStopDistance = Math.ceil(playerMovementSpeed / 4)
+        const maxStopDistance = Math.ceil(PLAYER.MOVEMENT.movementSpeed / 4)
         for (let i = 1; i <= maxStopDistance; i++) {
             const maxForce = i * 4
             if (forceMagnitude <= maxForce && distanceToTarget <= i) {
-                forceMagnitude = playerMovementSpeed * (distanceToTarget / i)
+                forceMagnitude =
+                    PLAYER.MOVEMENT.movementSpeed * (distanceToTarget / i)
                 adjusted = true
                 break
             }
         }
 
         if (!adjusted) {
-            forceMagnitude = playerMovementSpeed
+            forceMagnitude = PLAYER.MOVEMENT.movementSpeed
         }
 
         if (distanceToTarget > 0.5) {
@@ -261,7 +248,7 @@ const PlayerMovement: Component = () => {
     }
 
     const applyRotation = (
-        directionToTarget: THREE.Vector3,
+        directionToTarget: Vector3,
         distanceToTarget: number,
         ammo: typeof window.Ammo
     ) => {
@@ -270,7 +257,7 @@ const PlayerMovement: Component = () => {
             // Compute the rotation quaternion to look at the target
             const currentTransform = rigidPlayer.getWorldTransform()
             const currentRotation = currentTransform.getRotation()
-            const currentQuat = new THREE.Quaternion(
+            const currentQuat = new Quaternion(
                 currentRotation.x(),
                 currentRotation.y(),
                 currentRotation.z(),
@@ -278,13 +265,13 @@ const PlayerMovement: Component = () => {
             )
 
             // Calculate the target quaternion
-            const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(
-                new THREE.Vector3(0, 0, 1), // Assuming the object's forward direction is +Z
+            const targetQuaternion = new Quaternion().setFromUnitVectors(
+                new Vector3(0, 0, 1), // Assuming the object's forward direction is +Z
                 directionToTarget.clone().normalize()
             )
 
             // Interpolate between the current and target quaternion
-            currentQuat.slerp(targetQuaternion, playerRotationSpeed)
+            currentQuat.slerp(targetQuaternion, PLAYER.MOVEMENT.rotationSpeed)
 
             // Update the rigid body rotation
             currentTransform.setRotation(
@@ -303,10 +290,13 @@ const PlayerMovement: Component = () => {
         if (isJumping) {
             const currentVelocity = rigidPlayer.getLinearVelocity()
 
-            if (Math.abs(currentVelocity.y()) < fallVelocityTolerance) {
+            if (
+                Math.abs(currentVelocity.y()) <
+                PLAYER.JUMPING.fallVelocityTolerance
+            ) {
                 const jumpVelocity = new ammo.btVector3(
                     currentVelocity.x(),
-                    jumpForce,
+                    PLAYER.JUMPING.jumpForce,
                     currentVelocity.z()
                 )
                 rigidPlayer!.setLinearVelocity(jumpVelocity)
@@ -320,26 +310,30 @@ const PlayerMovement: Component = () => {
     const initializeRayLines = () => {
         const rayCount = 12 // Number of rays to form the quarter-ring
         const radius = 2 // Radius of the ring around the player
-        const lines: THREE.Line[] = []
+        const lines: Line[] = []
 
         for (let i = 0; i < rayCount; i++) {
             const angle = (i / (rayCount - 1)) * (Math.PI / 2) - Math.PI / 4 // Adjusted to be in front of the player
             const offsetX = Math.cos(angle + Math.PI / 2) * radius // Shift by 90 degrees to the front
             const offsetZ = Math.sin(angle + Math.PI / 2) * radius // Shift by 90 degrees to the front
 
-            const startVec = new THREE.Vector3(offsetX, 0, offsetZ)
-            const endVec = new THREE.Vector3(offsetX, -stepHeight, offsetZ)
+            const startVec = new Vector3(offsetX, 0, offsetZ)
+            const endVec = new Vector3(
+                offsetX,
+                -PLAYER.BUMPER.stepHeight,
+                offsetZ
+            )
 
-            const material = new THREE.LineBasicMaterial({ color: 0xff0000 })
-            const geometry = new THREE.BufferGeometry().setFromPoints([
+            const material = new LineBasicMaterial({ color: 0xff0000 })
+            const geometry = new BufferGeometry().setFromPoints([
                 startVec,
                 endVec
             ])
-            const line = new THREE.Line(geometry, material)
+            const line = new Line(geometry, material)
             line.frustumCulled = false
-            line.visible = showRayLines
+            line.visible = PLAYER.BUMPER.showRayLines
 
-            scene.add(line)
+            context.scene.add(line)
             lines.push(line)
         }
 
@@ -347,8 +341,8 @@ const PlayerMovement: Component = () => {
     }
 
     const updateRayLines = (
-        origin: THREE.Vector3,
-        rotation: THREE.Quaternion,
+        origin: Vector3,
+        rotation: Quaternion,
         playerHalfHeight: number
     ) => {
         const radius = 2
@@ -359,22 +353,22 @@ const PlayerMovement: Component = () => {
             const offsetX = Math.cos(angle + Math.PI / 2) * radius // Shift by 90 degrees to the front
             const offsetZ = Math.sin(angle + Math.PI / 2) * radius // Shift by 90 degrees to the front
 
-            const offset = new THREE.Vector3(offsetX, 0, offsetZ)
+            const offset = new Vector3(offsetX, 0, offsetZ)
             offset.applyQuaternion(rotation)
 
-            const rayStart = new THREE.Vector3(
+            const rayStart = new Vector3(
                 origin.x + offset.x,
-                origin.y - playerHalfHeight + stepHeight, // Adjust starting height
+                origin.y - playerHalfHeight + PLAYER.BUMPER.stepHeight, // Adjust starting height
                 origin.z + offset.z
             )
-            const rayEnd = new THREE.Vector3(
+            const rayEnd = new Vector3(
                 rayStart.x,
-                rayStart.y - stepHeight, // Extend ray length further
+                rayStart.y - PLAYER.BUMPER.stepHeight, // Extend ray length further
                 rayStart.z
             )
 
             // Update the line geometry
-            const geometry = lines[i].geometry as THREE.BufferGeometry
+            const geometry = lines[i].geometry as BufferGeometry
             geometry.setFromPoints([rayStart, rayEnd])
         }
     }
@@ -401,15 +395,16 @@ const PlayerMovement: Component = () => {
 
         // Check if the player is in the air or below the required height
         if (
-            Math.abs(currentVelocity.y()) > fallVelocityTolerance ||
-            (!allowJumpClimbing && currentVelocity.y() < 0) ||
+            Math.abs(currentVelocity.y()) >
+                PLAYER.JUMPING.fallVelocityTolerance ||
+            (!PLAYER.JUMPING.allowJumpClimbing && currentVelocity.y() < 0) ||
             origin.y() < calculateAmmoHeight(4) - 0.1 // tolerance
         ) {
             ammo.destroy(transform)
             return // Skip ledge detection if the player is in the air or below -0.1
         }
 
-        const rotation = new THREE.Quaternion(
+        const rotation = new Quaternion(
             transform.getRotation().x(),
             transform.getRotation().y(),
             transform.getRotation().z(),
@@ -420,7 +415,7 @@ const PlayerMovement: Component = () => {
 
         // Update ray lines positions
         updateRayLines(
-            new THREE.Vector3(origin.x(), origin.y(), origin.z()),
+            new Vector3(origin.x(), origin.y(), origin.z()),
             rotation,
             playerHalfHeight
         )
@@ -450,7 +445,7 @@ const PlayerMovement: Component = () => {
                 // Apply a small vertical force to step over the ledge
                 const stepUpVelocity = new ammo.btVector3(
                     rigidPlayer.getLinearVelocity().x(),
-                    jumpForce / 2, // Adjust as needed
+                    PLAYER.JUMPING.jumpForce / 2, // Adjust as needed
                     rigidPlayer.getLinearVelocity().z()
                 )
                 rigidPlayer.setLinearVelocity(stepUpVelocity)
@@ -471,11 +466,7 @@ const PlayerMovement: Component = () => {
         const transform = new ammo!.btTransform()
         rigidPlayer.getMotionState().getWorldTransform(transform)
         const origin = transform.getOrigin()
-        const currentPosition = new THREE.Vector3(
-            origin.x(),
-            origin.y(),
-            origin.z()
-        )
+        const currentPosition = new Vector3(origin.x(), origin.y(), origin.z())
 
         movePlayer()
 
@@ -501,13 +492,13 @@ const PlayerMovement: Component = () => {
                 movementTimeout = window.setTimeout(() => {
                     targetPos.set(0, 0, 0)
                     movementTimeout = null
-                }, movementIndicatorThreshold)
+                }, PLAYER.MOVEMENT.INDICATOR.threshold)
             }
             if (canJumpTimeout === null) {
                 canJumpTimeout = window.setTimeout(() => {
                     canJump = false
                     canJumpTimeout = null
-                }, canJumpWithRayLinesThreshold)
+                }, PLAYER.BUMPER.canJumpWithRayLinesThreshold)
             }
         } else {
             if (movementTimeout !== null) {
@@ -557,11 +548,8 @@ const PlayerMovement: Component = () => {
 
     return (
         <>
-            <PlayerMovementPointer
-                scene={scene}
-                onPointerCreated={setPointer}
-            />
-            {pointer() && <SetupMouseHandlers />}
+            <PlayerMovementIndicator />
+            <MouseHandlers />
         </>
     )
 }

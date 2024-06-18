@@ -1,14 +1,11 @@
 import { Component, onMount } from 'solid-js'
-import * as THREE from 'three'
-import AxisArrows from '@/components/_Helpers/AxisArrows'
-import { useSceneContext } from '@/components/_Scene/SceneContext'
+import { CapsuleGeometry, Group, Mesh, MeshStandardMaterial } from 'three'
+import AxisArrows from '../Helpers/AxisArrows'
+import { useSceneContext } from '@/components/_Scene/Context'
 
 const Player: Component<{
     initialPosition?: { x: number; y: number; z: number }
 }> = ({ initialPosition = { x: 0, y: 0, z: 0 } }) => {
-    const context = useSceneContext()
-    if (!context) return null
-
     const {
         scene,
         physicsWorld,
@@ -17,16 +14,16 @@ const Player: Component<{
         AmmoLib,
         setPlayerRef,
         setRigidPlayerRef
-    } = context
+    } = useSceneContext()!
     const ammo = AmmoLib()
-    const group = new THREE.Group()
+    const group = new Group()
 
     onMount(() => {
         const radius = 1
         const height = 4
-        const geometry = new THREE.CapsuleGeometry(radius, height, 40, 40)
-        const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
-        const player = new THREE.Mesh(geometry, material)
+        const geometry = new CapsuleGeometry(radius, height, 40, 40)
+        const material = new MeshStandardMaterial({ color: 0x00ff00 })
+        const player = new Mesh(geometry, material)
 
         player.castShadow = true
         player.receiveShadow = true

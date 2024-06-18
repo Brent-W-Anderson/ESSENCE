@@ -4,77 +4,47 @@ import {
     Component,
     createSignal,
     createEffect,
-    Accessor,
-    Setter,
     JSX,
     Suspense
 } from 'solid-js'
-import * as THREE from 'three'
+import {
+    Color,
+    Group,
+    Mesh,
+    PerspectiveCamera,
+    Scene,
+    WebGLRenderer
+} from 'three'
+import { SceneContextProps } from './_types'
+import { SCENE, PLAYER } from '@/config'
 
-const playerCameraDistance = 20
-const gravity = -50
-
-const SceneContext = createContext<{
-    scene: THREE.Scene
-    camera: THREE.PerspectiveCamera
-    renderer: THREE.WebGLRenderer
-    updateMesh: (
-        mesh: THREE.Group | THREE.Mesh,
-        rigidBody: Window['Ammo']['btRigidBody']
-    ) => void
-    createRigidBody: (
-        mesh: THREE.Group | THREE.Mesh,
-        mass: number,
-        size: { width: number; height: number; depth: number }
-    ) => Window['Ammo']['btRigidBody'] | undefined
-    physicsWorld?: () => Window['Ammo']['btDiscreteDynamicsWorld'] | undefined
-    AmmoLib: Accessor<typeof window.Ammo | undefined>
-    rigidPlayerRef?: Accessor<Window['Ammo']['btRigidBody'] | undefined>
-    setRigidPlayerRef?: Setter<Window['Ammo']['btRigidBody'] | undefined>
-    playerRef?: Accessor<THREE.Group | THREE.Mesh | undefined>
-    setPlayerRef?: Setter<THREE.Group | THREE.Mesh | undefined>
-    floorRef?: Accessor<THREE.Mesh | undefined>
-    setFloorRef?: Setter<THREE.Mesh | undefined>
-    objectsRef?: Accessor<
-        {
-            index: number
-            mesh: THREE.Mesh
-        }[]
-    >
-    setObjectsRef?: Setter<
-        {
-            index: number
-            mesh: THREE.Mesh
-        }[]
-    >
-}>()
+const SceneContext = createContext<SceneContextProps>()
 
 const [physicsWorld, setPhysicsWorld] =
     createSignal<Window['Ammo']['btDiscreteDynamicsWorld']>()
 const [AmmoLib, setAmmoLib] = createSignal<typeof window.Ammo>()
 const [rigidPlayerRef, setRigidPlayerRef] =
     createSignal<Window['Ammo']['btRigidBody']>()
-const [playerRef, setPlayerRef] = createSignal<THREE.Group | THREE.Mesh>()
-const [floorRef, setFloorRef] = createSignal<THREE.Mesh>()
+const [playerRef, setPlayerRef] = createSignal<Group | Mesh>()
+const [floorRef, setFloorRef] = createSignal<Mesh>()
 const [objectsRef, setObjectsRef] = createSignal<
-    { index: number; mesh: THREE.Mesh }[]
+    { index: number; mesh: Mesh }[]
 >([])
 
 const SceneProvider: Component<{
     children: JSX.Element | JSX.Element[]
 }> = props => {
-    const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0xffffff)
-
-    const camera = new THREE.PerspectiveCamera(
+    const scene = new Scene()
+    const camera = new PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
         0.1,
         100 // view distance
     )
-    camera.position.set(0, playerCameraDistance, 0)
+    const renderer = new WebGLRenderer({ antialias: true })
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true })
+    scene.background = new Color(0xffffff)
+    camera.position.set(0, PLAYER.CAMERA.distance, 0)
     renderer.setSize(window.innerWidth, window.innerHeight)
 
     const animate = () => {
@@ -88,7 +58,7 @@ const SceneProvider: Component<{
     }
 
     const createRigidBody = (
-        mesh: THREE.Group | THREE.Mesh,
+        mesh: Group | Mesh,
         mass: number,
         size: { width: number; height: number; depth: number }
     ) => {
@@ -135,7 +105,7 @@ const SceneProvider: Component<{
     }
 
     const updateMesh = (
-        mesh: THREE.Group | THREE.Mesh,
+        mesh: Group | Mesh,
         rigidBody: Window['Ammo']['btRigidBody']
     ) => {
         const ammo = AmmoLib()
@@ -180,7 +150,7 @@ const SceneProvider: Component<{
                 solver,
                 collisionConfiguration
             )
-            world.setGravity(new AmmoLibrary.btVector3(0, gravity, 0))
+            world.setGravity(new AmmoLibrary.btVector3(0, SCENE.gravity, 0))
 
             setPhysicsWorld(world)
             setAmmoLib(() => AmmoLibrary)

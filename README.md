@@ -4,9 +4,11 @@
 
 ### TODO:
 
-#### - allow jumping in the middle of a ledge bump.
+#### - fix bug - where player can't move around and continuously jump while holding the space-bar.
 
 #### - add queueing a jump if space-bar is pressed in the middle of a jump.
+
+#### - allow jumping in the middle of a ledge bump.
 
 #### - allow AxisArrows to drag objects around the scene.
 
