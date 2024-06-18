@@ -5,12 +5,14 @@ import { usePlayerMovementContext } from './PlayerMovementContext'
 import PlayerMovementPointer from './PlayerMovementPointer'
 import { useSceneContext } from '@/components/_Scene/SceneContext'
 
-const movementIndicatorThreshold = 1000 // 1 second
-const canJumpWithRayLinesThreshold = 50 // 1/10th second
+const movementIndicatorThreshold = 1000
+const canJumpWithRayLinesThreshold = 50
+const jumpingThreshold = 750
 const playerMovementSpeed = 12
 const playerRotationSpeed = 0.15
 const jumpForce = 20
 const fallVelocityTolerance = 0.1
+const allowJumpClimbing = true
 const showRayLines = true
 const stepHeight = 0.4
 
@@ -44,7 +46,10 @@ const PlayerMovement: Component = () => {
 
     const onKeyDown = (event: KeyboardEvent) => {
         const currentTime = Date.now()
-        if (event.key === ' ' && currentTime - lastJumpPressTime > 800) {
+        if (
+            event.key === ' ' &&
+            currentTime - lastJumpPressTime > jumpingThreshold
+        ) {
             isJumping = true
             lastJumpPressTime = currentTime
         }
@@ -397,7 +402,7 @@ const PlayerMovement: Component = () => {
         // Check if the player is in the air or below the required height
         if (
             Math.abs(currentVelocity.y()) > fallVelocityTolerance ||
-            currentVelocity.y() < 0 ||
+            (!allowJumpClimbing && currentVelocity.y() < 0) ||
             origin.y() < calculateAmmoHeight(4) - 0.1 // tolerance
         ) {
             ammo.destroy(transform)
