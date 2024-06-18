@@ -5,6 +5,7 @@ import { usePlayerMovementContext } from './PlayerMovementContext'
 import PlayerMovementPointer from './PlayerMovementPointer'
 import { useSceneContext } from '@/components/_Scene/SceneContext'
 
+const movementIndicatorThreshold = 1000 // 1 second
 const playerMovementSpeed = 12
 const playerRotationSpeed = 0.15
 const jumpForce = 20
@@ -35,6 +36,8 @@ const PlayerMovement: Component = () => {
     let isDKeyDown = false
     let isJumping = false
     let jumped = false
+    let lastPosition = new THREE.Vector3()
+    let movementTimeout: number | null = null
 
     const onKeyDown = (event: KeyboardEvent) => {
         if (event.key === ' ' && !jumped) {
@@ -473,6 +476,29 @@ const PlayerMovement: Component = () => {
         detectAndStepOverLedges(ammo!)
 
         ammo?.destroy(transform)
+
+        // Check for movement in the x or z direction
+        if (
+            currentPosition.distanceTo(lastPosition) < 0.01 &&
+            !isWKeyDown &&
+            !isAKeyDown &&
+            !isSKeyDown &&
+            !isDKeyDown
+        ) {
+            if (movementTimeout === null) {
+                movementTimeout = window.setTimeout(() => {
+                    targetPos.set(0, 0, 0)
+                    movementTimeout = null
+                }, movementIndicatorThreshold)
+            }
+        } else {
+            if (movementTimeout !== null) {
+                clearTimeout(movementTimeout)
+                movementTimeout = null
+            }
+        }
+
+        lastPosition.copy(currentPosition)
         requestAnimationFrame(animatePlayer)
     }
 
@@ -494,6 +520,10 @@ const PlayerMovement: Component = () => {
 
             if (intervalIdRef.current !== null) {
                 clearInterval(intervalIdRef.current)
+            }
+
+            if (movementTimeout !== null) {
+                clearTimeout(movementTimeout)
             }
         }
     })
