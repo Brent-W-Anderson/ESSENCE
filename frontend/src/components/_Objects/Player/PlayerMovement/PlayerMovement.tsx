@@ -6,6 +6,7 @@ import PlayerMovementPointer from './PlayerMovementPointer'
 import { useSceneContext } from '@/components/_Scene/SceneContext'
 
 const movementIndicatorThreshold = 1000 // 1 second
+const canJumpWithRayLinesThreshold = 100 // 1/10th second
 const playerMovementSpeed = 12
 const playerRotationSpeed = 0.15
 const jumpForce = 20
@@ -38,6 +39,8 @@ const PlayerMovement: Component = () => {
     let jumped = false
     let lastPosition = new THREE.Vector3()
     let movementTimeout: number | null = null
+    let canJumpTimeout: number | null = null
+    let canJump = true
 
     const onKeyDown = (event: KeyboardEvent) => {
         if (event.key === ' ' && !jumped) {
@@ -284,16 +287,18 @@ const PlayerMovement: Component = () => {
     const applyJumpForce = (ammo: typeof window.Ammo) => {
         if (isJumping) {
             const currentVelocity = rigidPlayer.getLinearVelocity()
+
             if (Math.abs(currentVelocity.y()) < fallVelocityTolerance) {
                 const jumpVelocity = new ammo.btVector3(
                     currentVelocity.x(),
                     jumpForce,
                     currentVelocity.z()
                 )
-                rigidPlayer.setLinearVelocity(jumpVelocity)
+                rigidPlayer!.setLinearVelocity(jumpVelocity)
                 ammo.destroy(jumpVelocity)
-                isJumping = false
             }
+
+            isJumping = false
         }
     }
 
@@ -431,7 +436,7 @@ const PlayerMovement: Component = () => {
             )
             context.physicsWorld?.()?.rayTest(rayStart, rayEnd, rayCallback)
 
-            if (rayCallback.hasHit()) {
+            if (rayCallback.hasHit() && canJump) {
                 updatePlayerFriction(0)
                 jumped = true
 
@@ -479,7 +484,8 @@ const PlayerMovement: Component = () => {
 
         // Check for movement in the x or z direction
         if (
-            currentPosition.distanceTo(lastPosition) < 0.01 &&
+            Math.abs(currentPosition.x - lastPosition.x) < 0.01 &&
+            Math.abs(currentPosition.z - lastPosition.z) < 0.01 &&
             !isWKeyDown &&
             !isAKeyDown &&
             !isSKeyDown &&
@@ -491,11 +497,22 @@ const PlayerMovement: Component = () => {
                     movementTimeout = null
                 }, movementIndicatorThreshold)
             }
+            if (canJumpTimeout === null) {
+                canJumpTimeout = window.setTimeout(() => {
+                    canJump = false
+                    canJumpTimeout = null
+                }, canJumpWithRayLinesThreshold)
+            }
         } else {
             if (movementTimeout !== null) {
                 clearTimeout(movementTimeout)
                 movementTimeout = null
             }
+            if (canJumpTimeout !== null) {
+                clearTimeout(canJumpTimeout)
+                canJumpTimeout = null
+            }
+            canJump = true // Allow jumping via ray lines if the player is moving
         }
 
         lastPosition.copy(currentPosition)
@@ -524,6 +541,10 @@ const PlayerMovement: Component = () => {
 
             if (movementTimeout !== null) {
                 clearTimeout(movementTimeout)
+            }
+
+            if (canJumpTimeout !== null) {
+                clearTimeout(canJumpTimeout)
             }
         }
     })
