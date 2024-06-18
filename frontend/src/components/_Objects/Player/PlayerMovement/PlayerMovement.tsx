@@ -36,17 +36,14 @@ const PlayerMovement: Component = () => {
     let isSKeyDown = false
     let isDKeyDown = false
     let isJumping = false
-    let jumped = false
     let lastPosition = new THREE.Vector3()
     let movementTimeout: number | null = null
     let canJumpTimeout: number | null = null
     let canJump = true
 
     const onKeyDown = (event: KeyboardEvent) => {
-        if (event.key === ' ' && !jumped) {
+        if (event.key === ' ' && !isJumping) {
             isJumping = true
-            jumped = true
-            updatePlayerFriction(0)
         }
 
         if (event.key === 'w') {
@@ -65,6 +62,8 @@ const PlayerMovement: Component = () => {
             isDKeyDown = true
             targetPos.set(0, 0, 0)
         }
+
+        updatePlayerFriction(0)
     }
 
     const onKeyUp = (event: KeyboardEvent) => {
@@ -79,6 +78,10 @@ const PlayerMovement: Component = () => {
         }
         if (event.key === 'd') {
             isDKeyDown = false
+        }
+
+        if (!isWKeyDown && !isAKeyDown && !isSKeyDown && !isDKeyDown) {
+            updatePlayerFriction(1)
         }
     }
 
@@ -238,10 +241,14 @@ const PlayerMovement: Component = () => {
             rigidPlayer.setLinearVelocity(translationalForce)
             ammo.destroy(translationalForce)
             pointer()?.position.set(targetPos.x, targetPos.y, targetPos.z)
+            updatePlayerFriction(0)
         } else if (pointer()) {
             pointer()!.visible = false
             // Clear the target position
             targetPos.set(0, 0, 0)
+            if (!isWKeyDown && !isAKeyDown && !isSKeyDown && !isDKeyDown) {
+                updatePlayerFriction(1)
+            }
         }
     }
 
@@ -300,14 +307,6 @@ const PlayerMovement: Component = () => {
             }
 
             isJumping = false
-        }
-    }
-
-    const checkIfGrounded = () => {
-        const currentVelocity = rigidPlayer.getLinearVelocity()
-        if (Math.abs(currentVelocity.y()) < fallVelocityTolerance) {
-            jumped = false
-            updatePlayerFriction(1)
         }
     }
 
@@ -396,6 +395,7 @@ const PlayerMovement: Component = () => {
         // Check if the player is in the air or below the required height
         if (
             Math.abs(currentVelocity.y()) > fallVelocityTolerance ||
+            currentVelocity.y() < 0 ||
             origin.y() < calculateAmmoHeight(4) - 0.1 // tolerance
         ) {
             ammo.destroy(transform)
@@ -439,7 +439,6 @@ const PlayerMovement: Component = () => {
 
             if (rayCallback.hasHit() && canJump) {
                 updatePlayerFriction(0)
-                jumped = true
 
                 // Apply a small vertical force to step over the ledge
                 const stepUpVelocity = new ammo.btVector3(
@@ -478,7 +477,6 @@ const PlayerMovement: Component = () => {
         applyMovementForce(directionToTarget, distanceToTarget, ammo!)
         applyRotation(directionToTarget, distanceToTarget, ammo!)
         applyJumpForce(ammo!)
-        checkIfGrounded()
         detectAndStepOverLedges(ammo!)
 
         ammo?.destroy(transform)

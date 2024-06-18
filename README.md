@@ -4,6 +4,10 @@
 
 ### TODO:
 
+#### - allow jumping in the middle of a ledge bump.
+
+#### - add queueing a jump if space-bar is pressed in the middle of a jump.
+
 #### - allow AxisArrows to drag objects around the scene.
 
 #### - zooming in should look at the top of the player, not the center.
@@ -12,11 +16,7 @@
 
 #### - split up PlayerMovement component more. -- start with key-bindings, since mouse-bindings are done.
 
-#### - don't let the bumper lines continuously keep jumping if in range and no volicity in the z/x direction (jumping up and down continuously over ledge).
-
 #### - when clicking a targeted location add a delay before moving to register the click (if click is being held, only delay initially).
-
-#### - BUG: don't allow the player to hold themselves against the wall if the jump is too high (needs to slide down -- keep track of how this is done, might want to impliment this on certain terain to climb).
 
 #### - player shouldn't try and walk through objects if they're in the direct line to the target destination (add smart pathing).
 
