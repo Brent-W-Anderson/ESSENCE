@@ -1,7 +1,7 @@
-import { useSceneContext } from '@/components/_Scene/Context'
 import { Component, createEffect, onCleanup } from 'solid-js'
-import { Mesh, MeshBasicMaterial, RingGeometry, Scene } from 'three'
+import { Mesh, MeshBasicMaterial, RingGeometry } from 'three'
 import { usePlayerMovementContext } from './Context'
+import { useSceneContext } from '@/components/_Scene/Context'
 import { PLAYER } from '@/config'
 
 const PlayerMovementIndicator: Component = () => {

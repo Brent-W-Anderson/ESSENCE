@@ -1,13 +1,13 @@
 import { Component, Suspense } from 'solid-js'
 import Cube from '@/components/_Objects/Cube'
 import Floor from '@/components/_Objects/Floor'
-import Player from '@/components/_Objects/Player/Player'
+import Lights from '@/components/_Objects/Lights'
 import PlayerCamera from '@/components/_Objects/Player/Camera'
 import PlayerMovement from '@/components/_Objects/Player/Movement'
 import PlayerMovementProvider from '@/components/_Objects/Player/Movement/Context'
-import Renderer from '@/components/_Scene/Renderer'
-import Lights from '@/components/_Objects/Lights'
+import Player from '@/components/_Objects/Player/Player'
 import { useSceneContext } from '@/components/_Scene/Context'
+import Renderer from '@/components/_Scene/Renderer'
 
 const HomePage: Component = () => {
     const { floorRef } = useSceneContext()!

@@ -6,9 +6,9 @@ import {
     Quaternion,
     Vector3
 } from 'three'
-import { MouseHandlers } from './MouseHandlers'
 import { usePlayerMovementContext } from './Context'
 import PlayerMovementIndicator from './Indicator'
+import { MouseHandlers } from './MouseHandlers'
 import { useSceneContext } from '@/components/_Scene/Context'
 import { PLAYER } from '@/config'
 
