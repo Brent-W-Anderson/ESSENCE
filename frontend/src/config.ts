@@ -2,12 +2,12 @@
     manual browser refresh */
 
 // SCENE
-export const SCENE = {
+export const SCENE={
     gravity: -50
 }
 
 // PLAYER
-export const PLAYER_CAMERA = {
+export const PLAYER_CAMERA={
     distance: 20,
     // set camera floating
     floatPolarAngle: false,
@@ -21,7 +21,7 @@ export const PLAYER_CAMERA = {
     mouseRotationSensitivity: 0.003
 }
 
-export const PLAYER_MOVEMENT_INDICATOR = {
+export const PLAYER_MOVEMENT_INDICATOR={
     // how long the targeted location will stay active (while not moving).
     threshold: 1000,
     ringColor: 0x00ff00,
@@ -30,13 +30,13 @@ export const PLAYER_MOVEMENT_INDICATOR = {
     segments: 32
 }
 
-export const PLAYER_MOVEMENT = {
+export const PLAYER_MOVEMENT={
     movementSpeed: 12,
     rotationSpeed: 0.15,
     INDICATOR: PLAYER_MOVEMENT_INDICATOR
 }
 
-export const PLAYER_BUMPER = {
+export const PLAYER_BUMPER={
     /* If the player hits a ledge and doesn't move, this will timeout the bumper
         being able to jump again with the ray lines */
     canJumpWithRayLinesThreshold: 50, // this stops jumping in place.
@@ -44,7 +44,7 @@ export const PLAYER_BUMPER = {
     stepHeight: 0.4
 }
 
-export const PLAYER_JUMPING = {
+export const PLAYER_JUMPING={
     jumpForce: 20,
     // how long until the player can jump again (prevents jumping during a jump).
     jumpingThreshold: 750,
@@ -52,7 +52,7 @@ export const PLAYER_JUMPING = {
     allowJumpClimbing: true
 }
 
-export const PLAYER = {
+export const PLAYER={
     CAMERA: PLAYER_CAMERA,
     MOVEMENT: PLAYER_MOVEMENT,
     BUMPER: PLAYER_BUMPER,
@@ -60,24 +60,27 @@ export const PLAYER = {
 }
 
 // HELPERS
-export const AXIS_ARROWS = {
+export const AXIS_ARROWS={
     height: 0.5
 }
 
-export const COORDINATES = {
+export const COORDINATES={
     height: 0.5,
-    font: 'Bold 24px Arial',
+    font: 'Arial',
+    fontWeight: 'normal',
+    fontSize: 128,
+    fontQuality: 256,
     fontColor: 'rgba(255,255,255,1.0)',
     fontStrokeColor: 'black'
 }
 
-export const HELPERS = {
+export const HELPERS={
     AXIS_ARROWS: AXIS_ARROWS,
     COORDINATES: COORDINATES
 }
 
 // GLOBAL CONFIG
-const CONFIG = {
+const CONFIG={
     SCENE: SCENE,
     PLAYER: PLAYER,
     HELPERS: HELPERS

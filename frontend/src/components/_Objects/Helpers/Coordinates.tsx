@@ -39,48 +39,38 @@ const Coordinates: Component<{
     const parentHeight = parentBoundingBox.max.y - parentBoundingBox.min.y
     const halfHeight = rigidHalfHeight ? rigidHalfHeight : parentHeight / 2
 
-    const createTextSprite = (text: string) => {
+    const createOrUpdateTextSprite = (text: string, sprite?: Sprite) => {
+        const padding = 10
+
         const canvas = document.createElement('canvas')
         const context = canvas.getContext('2d')!
 
-        canvas.width = 400
-        canvas.height = 100
-        context.font = COORDINATES.font
+        const distance = camera.position.distanceTo(mesh.position)
+        const fontSize = COORDINATES.fontSize * (distance / 16) // Adjust the divisor to control the scaling effect
+        const font = `${COORDINATES.fontWeight} ${fontSize}px ${COORDINATES.font}`
+        context.font = font
+
+        const textMetrics = context.measureText(text)
+        const textWidth = textMetrics.width
+        const textHeight =
+            textMetrics.actualBoundingBoxAscent +
+            textMetrics.actualBoundingBoxDescent
+
+        // Set canvas dimensions based on text size and font size
+        canvas.width = Math.ceil(textWidth + padding * 2)
+        canvas.height = Math.ceil(textHeight + padding * 2)
+
+        // Set font styles again after changing canvas dimensions
+        context.font = font
         context.fillStyle = COORDINATES.fontColor
         context.lineWidth = 4
         context.strokeStyle = COORDINATES.fontStrokeColor
 
-        const textWidth = context.measureText(text).width
-        const xPosition = (canvas.width - textWidth) / 2
-        context.strokeText(text, xPosition, 40)
-        context.fillText(text, xPosition, 40)
+        const xPosition = padding
+        const yPosition = textMetrics.actualBoundingBoxAscent + padding
 
-        const texture = new Texture(canvas)
-        texture.needsUpdate = true
-
-        const spriteMaterial = new SpriteMaterial({ map: texture })
-        const sprite = new Sprite(spriteMaterial)
-        sprite.scale.set(6, 2, 1)
-
-        return sprite
-    }
-
-    const updateTextSprite = () => {
-        const text = `x: ${mesh.position.x.toFixed(1)}, y: ${Math.abs(mesh.position.y - halfHeight).toFixed(1)}, z: ${mesh.position.z.toFixed(1)}`
-        const canvas = document.createElement('canvas')
-        const context = canvas.getContext('2d')!
-
-        canvas.width = 400
-        canvas.height = 100
-        context.font = COORDINATES.font
-        context.fillStyle = COORDINATES.fontColor
-        context.lineWidth = 4
-        context.strokeStyle = COORDINATES.fontStrokeColor
-
-        const textWidth = context.measureText(text).width
-        const xPosition = (canvas.width - textWidth) / 2
-        context.strokeText(text, xPosition, 40)
-        context.fillText(text, xPosition, 40)
+        context.strokeText(text, xPosition, yPosition)
+        context.fillText(text, xPosition, yPosition)
 
         const texture = new Texture(canvas)
         texture.needsUpdate = true
@@ -88,28 +78,57 @@ const Coordinates: Component<{
         if (sprite) {
             sprite.material.map?.dispose()
             sprite.material.map = texture
+            sprite.scale.set(
+                canvas.width / COORDINATES.fontQuality,
+                canvas.height / COORDINATES.fontQuality,
+                1
+            ) // Adjust scale based on your requirements
+
+            if (distance > 40) {
+                sprite.visible = false
+            }
+        } else {
+            const spriteMaterial = new SpriteMaterial({ map: texture })
+            const newSprite = new Sprite(spriteMaterial)
+            newSprite.scale.set(
+                canvas.width / COORDINATES.fontQuality,
+                canvas.height / COORDINATES.fontQuality,
+                1
+            ) // Adjust scale based on your requirements
+
+            if (distance > 40) {
+                newSprite.visible = false
+            }
+
+            return newSprite
         }
     }
 
     onMount(() => {
         scene.add(helper)
 
-        sprite = createTextSprite(
-            `x: ${mesh.position.x.toFixed(1)}, y: ${Math.abs(mesh.position.y - halfHeight).toFixed(1)}, z: ${mesh.position.z.toFixed(1)}`
-        )
-        sprite.position.copy(
-            new Vector3(
-                0,
-                halfHeight + COORDINATES.height + (arrows ? 2 : 0),
-                0
-            )
-        )
+        const initialText = `x: ${mesh.position.x.toFixed(1)}, y: ${Math.abs(mesh.position.y - halfHeight).toFixed(1)}, z: ${mesh.position.z.toFixed(1)}`
+        sprite = createOrUpdateTextSprite(initialText) as Sprite
         helper.add(sprite)
         sprite.visible = alwaysVisible
 
+        const updateSpritePosition = () => {
+            const distance = camera.position.distanceTo(mesh.position)
+            const scaledHeight = arrows
+                ? COORDINATES.height * (distance < 4 ? 1 : distance / 4)
+                : COORDINATES.height
+            sprite.position.set(
+                0,
+                halfHeight + scaledHeight + (arrows ? 1 : 0),
+                0
+            )
+        }
+
         const animate = () => {
             requestAnimationFrame(animate)
-            updateTextSprite()
+            const updatedText = `x: ${mesh.position.x.toFixed(1)}, y: ${Math.abs(mesh.position.y - halfHeight).toFixed(1)}, z: ${mesh.position.z.toFixed(1)}`
+            createOrUpdateTextSprite(updatedText, sprite)
+            updateSpritePosition()
             helper.position.copy(mesh.position)
         }
         animate()

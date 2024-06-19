@@ -33,10 +33,20 @@ const AxisArrows: Component<{
 
     scene.add(helper)
 
+    let arrowX: ArrowHelper, arrowY: ArrowHelper, arrowZ: ArrowHelper
+
+    const updateArrowsScale = () => {
+        const distance = camera.position.distanceTo(mesh.position)
+        const scale = distance / 16 // Adjust the divisor to control the scaling effect
+        arrowX.setLength(2 * scale, 0.5 * scale, 0.2 * scale)
+        arrowY.setLength(2 * scale, 0.5 * scale, 0.2 * scale)
+        arrowZ.setLength(2 * scale, 0.5 * scale, 0.2 * scale)
+    }
+
     onMount(() => {
         const topPosition = new Vector3(0, halfHeight + AXIS_ARROWS.height, 0)
 
-        const arrowX = new ArrowHelper(
+        arrowX = new ArrowHelper(
             new Vector3(1, 0, 0),
             topPosition.clone(),
             2,
@@ -44,7 +54,7 @@ const AxisArrows: Component<{
         )
         if (showArrows) helper.add(arrowX)
 
-        const arrowY = new ArrowHelper(
+        arrowY = new ArrowHelper(
             new Vector3(0, 0, 1),
             topPosition.clone(),
             2,
@@ -52,7 +62,7 @@ const AxisArrows: Component<{
         )
         if (showArrows) helper.add(arrowY)
 
-        const arrowZ = new ArrowHelper(
+        arrowZ = new ArrowHelper(
             new Vector3(0, 1, 0),
             topPosition.clone(),
             2,
@@ -67,6 +77,7 @@ const AxisArrows: Component<{
 
         const animate = () => {
             requestAnimationFrame(animate)
+            updateArrowsScale()
             helper.position.copy(mesh.position)
         }
         animate()
@@ -88,10 +99,15 @@ const AxisArrows: Component<{
                     true
                 )
 
-                if (intersectsMesh.length > 0) {
+                const distance = camera.position.distanceTo(mesh.position)
+                if (intersectsMesh.length > 0 && distance <= 40) {
                     setVisible(true)
                     hovered = true
-                } else if (hovered && intersectsArrowGroup.length > 0) {
+                } else if (
+                    hovered &&
+                    intersectsArrowGroup.length > 0 &&
+                    distance <= 40
+                ) {
                     setVisible(true)
                 } else {
                     setVisible(false)

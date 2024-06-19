@@ -14,8 +14,6 @@
 
 #### - zooming in should look at the top of the player, not the center.
 
-#### - AxisArrows + coordinates should be larger if they're further from the camera (zooming in-or-out should also decrease/increase font-size).
-
 #### - split up PlayerMovement component more. -- start with key-bindings, since mouse-bindings are done.
 
 #### - player shouldn't try and walk through objects if they're in the direct line to the target destination (add smart pathing).
