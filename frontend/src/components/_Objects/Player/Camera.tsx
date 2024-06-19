@@ -25,9 +25,6 @@ const PlayerCamera: Component = () => {
     let startY = 0
     let initialDistance = 0
 
-    // Default to no rotation
-    controls.enableRotate = false // Disable internal OrbitControls rotation
-
     // Limit controls to prevent panning
     controls.enablePan = false
     controls.enableDamping = true
@@ -44,7 +41,6 @@ const PlayerCamera: Component = () => {
     controls.zoomSpeed = 3
 
     // Define the offset for targeting the top of the player
-    // half-height = 3, so 3 / 2 = 1.5 to target the top.
     const playerHeightOffset = new Vector3(0, 1.5, 0)
     const targetPosition = new Vector3()
 
@@ -64,21 +60,22 @@ const PlayerCamera: Component = () => {
 
     const handleMouseDown = (event: MouseEvent) => {
         if (event.button === 2) {
-            // Right-click
             mouseDown = true
             startX = event.clientX
             startY = event.clientY
             isUserInteracting = true
             initialDistance = camera.position.distanceTo(player.position)
+
+            // Synchronize current angles with the camera's actual angles
+            currentPolarAngle = controls.getPolarAngle()
+            currentAzimuthAngle = controls.getAzimuthalAngle()
         }
     }
 
     const handleMouseUp = (event: MouseEvent) => {
         if (event.button === 2) {
-            // Right-click
             mouseDown = false
             isUserInteracting = false
-            targetDistance = camera.position.distanceTo(player.position)
         }
     }
 
@@ -147,45 +144,38 @@ const PlayerCamera: Component = () => {
         if (keysPressed.ArrowRight.pressed) {
             currentAzimuthAngle -= keysPressed.ArrowRight.speed
         }
-        controls.minPolarAngle = currentPolarAngle
-        controls.maxPolarAngle = currentPolarAngle
-        controls.minAzimuthAngle = currentAzimuthAngle
-        controls.maxAzimuthAngle = currentAzimuthAngle
+
+        if (!isUserInteracting) {
+            currentPolarAngle = controls.getPolarAngle()
+            currentAzimuthAngle = controls.getAzimuthalAngle()
+        }
+
+        if (floatPolarAngle) {
+            controls.minPolarAngle = 0.2
+            controls.maxPolarAngle = 1
+        } else {
+            controls.minPolarAngle = currentPolarAngle
+            controls.maxPolarAngle = currentPolarAngle
+        }
+
+        if (floatAzimuthAngle) {
+            controls.minAzimuthAngle = -Infinity
+            controls.maxAzimuthAngle = Infinity
+        } else {
+            controls.minAzimuthAngle = currentAzimuthAngle
+            controls.maxAzimuthAngle = currentAzimuthAngle
+        }
+
         controls.update()
     }
 
     const animate = () => {
-        // Always update the controls target to follow the player
         targetPosition.copy(player.position).add(playerHeightOffset)
         controls.target.copy(targetPosition)
 
-        if (isUserInteracting) {
-            // Skip updating angles based on keyboard if the user is interacting with the mouse
-            const direction = new Vector3()
-                .copy(camera.position)
-                .sub(player.position)
-                .normalize()
-
-            camera.position.copy(
-                player.position
-                    .clone()
-                    .addScaledVector(direction, initialDistance)
-            )
-            controls.update()
-        } else {
+        if (!isUserInteracting) {
             updateCameraAngles()
 
-            if (!floatPolarAngle) {
-                controls.minPolarAngle = currentPolarAngle
-                controls.maxPolarAngle = currentPolarAngle
-            }
-
-            if (!floatAzimuthAngle) {
-                controls.minAzimuthAngle = currentAzimuthAngle
-                controls.maxAzimuthAngle = currentAzimuthAngle
-            }
-
-            // When not interacting, smoothly move the camera to the target position
             const direction = new Vector3()
                 .copy(camera.position)
                 .sub(player.position)
@@ -195,11 +185,26 @@ const PlayerCamera: Component = () => {
                 .copy(player.position)
                 .addScaledVector(direction, targetDistance)
 
-            // Update the camera's position smoothly
             camera.position.lerp(newCameraPosition, cameraFloatEasing)
-            controls.update()
+        } else {
+            // Ensure the camera's distance to the player remains constant while interacting
+            const direction = new Vector3()
+                .copy(camera.position)
+                .sub(player.position)
+                .normalize()
+
+            camera.position.copy(
+                player.position
+                    .clone()
+                    .addScaledVector(direction, targetDistance)
+            )
+
+            // Synchronize current angles with the camera's actual angles continuously while interacting
+            currentPolarAngle = controls.getPolarAngle()
+            currentAzimuthAngle = controls.getAzimuthalAngle()
         }
 
+        controls.update()
         requestAnimationFrame(animate)
     }
 

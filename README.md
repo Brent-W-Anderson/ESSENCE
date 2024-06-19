@@ -4,7 +4,9 @@
 
 ### TODO:
 
-#### - fix bug - where floating the camera angles doesn't let the camera follow the player.
+#### - fix bug - where floating the camera angles doesn't adjust with cameraFloatEasing (the little bit the camera eases with the player movement causes that small little snap when starting an initial rotation).
+
+#### - fix bug - where at max zoom-out of camera, then the camera shouldn't attempt to go further.
 
 #### - fix bug - where player can't move around and continuously jump while holding the space-bar.
 
