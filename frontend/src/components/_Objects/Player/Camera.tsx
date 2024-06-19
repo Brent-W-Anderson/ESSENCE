@@ -43,7 +43,11 @@ const PlayerCamera: Component = () => {
     controls.maxDistance = 20
     controls.zoomSpeed = 3
 
-    controls.target.copy(player.position)
+    // Define the offset for targeting the top of the player
+    // half-height = 3, so 3 / 2 = 1.5 to target the top.
+    const playerHeightOffset = new Vector3(0, 1.5, 0)
+    const targetPosition = new Vector3()
+
     controls.mouseButtons = {
         LEFT: null,
         RIGHT: MOUSE.ROTATE
@@ -152,7 +156,8 @@ const PlayerCamera: Component = () => {
 
     const animate = () => {
         // Always update the controls target to follow the player
-        controls.target.copy(player.position)
+        targetPosition.copy(player.position).add(playerHeightOffset)
+        controls.target.copy(targetPosition)
 
         if (isUserInteracting) {
             // Skip updating angles based on keyboard if the user is interacting with the mouse

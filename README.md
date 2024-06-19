@@ -4,6 +4,8 @@
 
 ### TODO:
 
+#### - fix bug - where floating the camera angles doesn't let the camera follow the player.
+
 #### - fix bug - where player can't move around and continuously jump while holding the space-bar.
 
 #### - add queueing a jump if space-bar is pressed in the middle of a jump.
@@ -11,8 +13,6 @@
 #### - allow jumping in the middle of a ledge bump.
 
 #### - allow AxisArrows to drag objects around the scene.
-
-#### - zooming in should look at the top of the player, not the center.
 
 #### - split up PlayerMovement component more. -- start with key-bindings, since mouse-bindings are done.
 
