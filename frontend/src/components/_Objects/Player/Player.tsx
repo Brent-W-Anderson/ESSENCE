@@ -1,6 +1,6 @@
 import { Component, onMount } from 'solid-js'
 import { CapsuleGeometry, Group, Mesh, MeshStandardMaterial } from 'three'
-import AxisArrows from '../Helpers/AxisArrows'
+import Coordinates from '../Helpers/Coordinates'
 import { useSceneContext } from '@/components/_Scene/Context'
 
 const Player: Component<{
@@ -72,12 +72,14 @@ const Player: Component<{
         }
     })
 
+    const helperGroup = new Group()
     return (
-        <AxisArrows
+        <Coordinates
             mesh={group}
+            helper={helperGroup}
             rigidHalfHeight={3}
+            arrows={false}
             alwaysVisible
-            showArrows={false}
         />
     )
 }

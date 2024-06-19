@@ -65,7 +65,7 @@ export const AXIS_ARROWS = {
 }
 
 export const COORDINATES = {
-    height: 0,
+    height: 0.5,
     font: 'Bold 24px Arial',
     fontColor: 'rgba(255,255,255,1.0)',
     fontStrokeColor: 'black'

@@ -6,7 +6,7 @@
     ],
     "scripts": {
         "dev": "yarn workspace frontend start",
-        "start": "yarn workspace backend dev",
+        "start": "yarn build && yarn workspace backend dev",
         "build": "yarn build:frontend && yarn build:backend",
         "build:frontend": "cd frontend/ && yarn build && cd ../",
         "build:backend": "cp \"backend/server.js\" \"dist/server.js\"",

@@ -1,6 +1,7 @@
 import { Component, onMount } from 'solid-js'
-import { BoxGeometry, Mesh, MeshStandardMaterial } from 'three'
+import { BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three'
 import AxisArrows from './Helpers/AxisArrows'
+import Coordinates from './Helpers/Coordinates'
 import { useSceneContext } from '@/components/_Scene/Context'
 
 const Cube: Component<{
@@ -45,7 +46,13 @@ const Cube: Component<{
         }
     })
 
-    return <AxisArrows mesh={cube} />
+    const helperGroup = new Group()
+    return (
+        <>
+            <AxisArrows mesh={cube} helper={helperGroup} />
+            <Coordinates mesh={cube} helper={helperGroup} />
+        </>
+    )
 }
 
 export default Cube
