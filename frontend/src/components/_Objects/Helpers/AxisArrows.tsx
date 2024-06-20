@@ -36,7 +36,7 @@ const AxisArrows: Component<{
     let arrowX: ArrowHelper, arrowY: ArrowHelper, arrowZ: ArrowHelper
 
     const updateArrowsScale = () => {
-        const distance = camera.position.distanceTo(mesh.position)
+        const distance = camera().position.distanceTo(mesh.position)
         const scale = distance / 16 // Adjust the divisor to control the scaling effect
         arrowX.setLength(2 * scale, 0.5 * scale, 0.2 * scale)
         arrowY.setLength(2 * scale, 0.5 * scale, 0.2 * scale)
@@ -71,14 +71,19 @@ const AxisArrows: Component<{
         if (showArrows) helper.add(arrowZ)
 
         const arrows = showArrows ? [arrowX, arrowY, arrowZ] : []
+        let hovered = false
 
         // Set arrows visibility based on the alwaysVisible prop
         arrows.forEach(arrow => (arrow.visible = alwaysVisible))
 
         const animate = () => {
             requestAnimationFrame(animate)
-            updateArrowsScale()
-            helper.position.copy(mesh.position)
+
+            const distance = camera().position.distanceTo(mesh.position)
+            if ((hovered || alwaysVisible) && distance <= 50) {
+                updateArrowsScale()
+                helper.position.copy(mesh.position)
+            }
         }
         animate()
 
@@ -86,12 +91,11 @@ const AxisArrows: Component<{
             // Raycaster setup for mouse hover detection
             const raycaster = new Raycaster()
             const mouse = new Vector2()
-            let hovered = false
 
             const onMouseMove = (event: MouseEvent) => {
                 mouse.x = (event.clientX / window.innerWidth) * 2 - 1
                 mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
-                raycaster.setFromCamera(mouse, camera)
+                raycaster.setFromCamera(mouse, camera())
 
                 const intersectsMesh = raycaster.intersectObject(mesh, true)
                 const intersectsArrowGroup = raycaster.intersectObject(
@@ -99,14 +103,14 @@ const AxisArrows: Component<{
                     true
                 )
 
-                const distance = camera.position.distanceTo(mesh.position)
-                if (intersectsMesh.length > 0 && distance <= 40) {
+                const distance = camera().position.distanceTo(mesh.position)
+                if (intersectsMesh.length > 0 && distance <= 50) {
                     setVisible(true)
                     hovered = true
                 } else if (
                     hovered &&
                     intersectsArrowGroup.length > 0 &&
-                    distance <= 40
+                    distance <= 50
                 ) {
                     setVisible(true)
                 } else {

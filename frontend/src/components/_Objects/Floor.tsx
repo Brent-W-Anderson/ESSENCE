@@ -8,7 +8,7 @@ const Floor: Component = () => {
     let floor: Mesh | null = null
 
     onMount(() => {
-        const floorGeometry = new PlaneGeometry(40, 40)
+        const floorGeometry = new PlaneGeometry(1000, 1000)
         const floorMaterial = new MeshStandardMaterial({
             color: 0xcccccc
         })
@@ -22,8 +22,8 @@ const Floor: Component = () => {
         setFloorRef?.(floor)
 
         const rigid = createRigidBody(floor, 0, {
-            width: 20,
-            height: 20,
+            width: 500,
+            height: 500,
             depth: 0
         })
         rigid && physicsWorld && physicsWorld()?.addRigidBody(rigid)
@@ -59,11 +59,11 @@ const Floor: Component = () => {
 
         const wallHeight = 2
         const wallThickness = 1
-        const halfSize = 19.5 // Half the size of your floor plane
+        const halfSize = 500 - wallThickness / 2
 
         const walls = [
             createWall(
-                40,
+                1000,
                 wallHeight,
                 wallThickness,
                 0,
@@ -71,7 +71,7 @@ const Floor: Component = () => {
                 halfSize
             ), // Front wall
             createWall(
-                40,
+                1000,
                 wallHeight,
                 wallThickness,
                 0,
@@ -81,7 +81,7 @@ const Floor: Component = () => {
             createWall(
                 wallThickness,
                 wallHeight,
-                40,
+                1000,
                 halfSize,
                 wallHeight / 2,
                 0
@@ -89,7 +89,7 @@ const Floor: Component = () => {
             createWall(
                 wallThickness,
                 wallHeight,
-                40,
+                1000,
                 -halfSize,
                 wallHeight / 2,
                 0

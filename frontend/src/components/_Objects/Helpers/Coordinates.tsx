@@ -3,7 +3,6 @@ import {
     Sprite,
     SpriteMaterial,
     Texture,
-    Vector3,
     Object3D,
     Raycaster,
     Vector2,
@@ -45,7 +44,7 @@ const Coordinates: Component<{
         const canvas = document.createElement('canvas')
         const context = canvas.getContext('2d')!
 
-        const distance = camera.position.distanceTo(mesh.position)
+        const distance = camera().position.distanceTo(mesh.position)
         const fontSize = COORDINATES.fontSize * (distance / 16) // Adjust the divisor to control the scaling effect
         const font = `${COORDINATES.fontWeight} ${fontSize}px ${COORDINATES.font}`
         context.font = font
@@ -83,10 +82,6 @@ const Coordinates: Component<{
                 canvas.height / COORDINATES.fontQuality,
                 1
             ) // Adjust scale based on your requirements
-
-            if (distance > 40) {
-                sprite.visible = false
-            }
         } else {
             const spriteMaterial = new SpriteMaterial({ map: texture })
             const newSprite = new Sprite(spriteMaterial)
@@ -96,10 +91,6 @@ const Coordinates: Component<{
                 1
             ) // Adjust scale based on your requirements
 
-            if (distance > 40) {
-                newSprite.visible = false
-            }
-
             return newSprite
         }
     }
@@ -108,12 +99,14 @@ const Coordinates: Component<{
         scene.add(helper)
 
         const initialText = `x: ${mesh.position.x.toFixed(1)}, y: ${Math.abs(mesh.position.y - halfHeight).toFixed(1)}, z: ${mesh.position.z.toFixed(1)}`
+        let hovered = false
+
         sprite = createOrUpdateTextSprite(initialText) as Sprite
         helper.add(sprite)
         sprite.visible = alwaysVisible
 
         const updateSpritePosition = () => {
-            const distance = camera.position.distanceTo(mesh.position)
+            const distance = camera().position.distanceTo(mesh.position)
             const scaledHeight = arrows
                 ? COORDINATES.height * (distance < 4 ? 1 : distance / 4)
                 : COORDINATES.height
@@ -126,10 +119,16 @@ const Coordinates: Component<{
 
         const animate = () => {
             requestAnimationFrame(animate)
-            const updatedText = `x: ${mesh.position.x.toFixed(1)}, y: ${Math.abs(mesh.position.y - halfHeight).toFixed(1)}, z: ${mesh.position.z.toFixed(1)}`
-            createOrUpdateTextSprite(updatedText, sprite)
-            updateSpritePosition()
-            helper.position.copy(mesh.position)
+
+            const distance = camera().position.distanceTo(mesh.position)
+            if ((hovered || alwaysVisible) && distance <= 50) {
+                const updatedText = `x: ${mesh.position.x.toFixed(1)}, y: ${Math.abs(mesh.position.y - halfHeight).toFixed(1)}, z: ${mesh.position.z.toFixed(1)}`
+                createOrUpdateTextSprite(updatedText, sprite)
+                updateSpritePosition()
+                helper.position.copy(mesh.position)
+            } else {
+                sprite.visible = false
+            }
         }
         animate()
 
@@ -137,12 +136,11 @@ const Coordinates: Component<{
             // Raycaster setup for mouse hover detection
             const raycaster = new Raycaster()
             const mouse = new Vector2()
-            let hovered = false
 
             const onMouseMove = (event: MouseEvent) => {
                 mouse.x = (event.clientX / window.innerWidth) * 2 - 1
                 mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
-                raycaster.setFromCamera(mouse, camera)
+                raycaster.setFromCamera(mouse, camera())
 
                 const intersectsMesh = raycaster.intersectObject(mesh, true)
                 const intersectsCoordinatesGroup = raycaster.intersectObject(

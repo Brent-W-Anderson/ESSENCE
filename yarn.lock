@@ -3069,6 +3069,7 @@ __metadata:
     rollup-plugin-visualizer: "npm:^5.12.0"
     sass: "npm:^1.77.5"
     solid-js: "npm:^1.8.17"
+    stats-js: "npm:^1.0.1"
     three: "npm:^0.165.0"
     typed-scss-modules: "npm:^8.0.1"
     vite: "npm:^5.3.1"
@@ -5627,6 +5628,13 @@ __metadata:
   dependencies:
     minipass: "npm:^7.0.3"
   checksum: 10c0/e5a1e23a4057a86a97971465418f22ea89bd439ac36ade88812dd920e4e61873e8abd6a9b72a03a67ef50faa00a2daf1ab745c5a15b46d03e0544a0296354227
+  languageName: node
+  linkType: hard
+
+"stats-js@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "stats-js@npm:1.0.1"
+  checksum: 10c0/217d10e4b23dd3e30e2d2006d5f9404170e8ee55501730783689951ca3df2277effff7bbdef89b4f49233efc56b271bc7d7adf514617008888f0ab40097b0e54
   languageName: node
   linkType: hard
 

@@ -8,7 +8,7 @@ const PlayerCamera: Component = () => {
     const context = useSceneContext()!
     const player = context.playerRef!()!
     const { scene, camera, renderer } = context
-    const controls = new OrbitControls(camera, renderer.domElement)
+    const controls = new OrbitControls(camera(), renderer.domElement)
     const {
         floatPolarAngle,
         floatAzimuthAngle,
@@ -16,14 +16,13 @@ const PlayerCamera: Component = () => {
         arrowKeyRotationSensitivity,
         mouseRotationSensitivity
     } = PLAYER.CAMERA
-    let { currentPolarAngle, currentAzimuthAngle } = PLAYER.CAMERA
+    let { currentPolarAngle, currentAzimuthAngle, distance } = PLAYER.CAMERA
 
-    let targetDistance = 5
+    let targetDistance = distance
     let isUserInteracting = false
     let mouseDown = false
     let startX = 0
     let startY = 0
-    let initialDistance = 0
 
     // Limit controls to prevent panning
     controls.enablePan = false
@@ -36,7 +35,7 @@ const PlayerCamera: Component = () => {
     controls.rotateSpeed = 0.5
 
     // Set zoom distance limits
-    controls.minDistance = 5
+    controls.minDistance = 10
     controls.maxDistance = 20
     controls.zoomSpeed = 3
 
@@ -49,6 +48,19 @@ const PlayerCamera: Component = () => {
         RIGHT: MOUSE.ROTATE
     }
     controls.update()
+
+    const setInitialCameraPosition = () => {
+        const spherical = new Vector3()
+        const radius = targetDistance
+        spherical.setFromSphericalCoords(
+            radius,
+            currentPolarAngle,
+            currentAzimuthAngle
+        )
+        camera().position.copy(player.position).add(spherical)
+        controls.target.copy(player.position).add(playerHeightOffset)
+        controls.update()
+    }
 
     const keysPressed: { [key: string]: { pressed: boolean; speed: number } } =
         {
@@ -64,7 +76,6 @@ const PlayerCamera: Component = () => {
             startX = event.clientX
             startY = event.clientY
             isUserInteracting = true
-            initialDistance = camera.position.distanceTo(player.position)
 
             // Synchronize current angles with the camera's actual angles
             currentPolarAngle = controls.getPolarAngle()
@@ -177,7 +188,7 @@ const PlayerCamera: Component = () => {
             updateCameraAngles()
 
             const direction = new Vector3()
-                .copy(camera.position)
+                .copy(camera().position)
                 .sub(player.position)
                 .normalize()
 
@@ -185,15 +196,15 @@ const PlayerCamera: Component = () => {
                 .copy(player.position)
                 .addScaledVector(direction, targetDistance)
 
-            camera.position.lerp(newCameraPosition, cameraFloatEasing)
+            camera().position.lerp(newCameraPosition, cameraFloatEasing)
         } else {
             // Ensure the camera's distance to the player remains constant while interacting
             const direction = new Vector3()
-                .copy(camera.position)
+                .copy(camera().position)
                 .sub(player.position)
                 .normalize()
 
-            camera.position.copy(
+            camera().position.copy(
                 player.position
                     .clone()
                     .addScaledVector(direction, targetDistance)
@@ -209,8 +220,9 @@ const PlayerCamera: Component = () => {
     }
 
     createEffect(() => {
-        scene.add(camera)
-        targetDistance = camera.position.distanceTo(player.position)
+        scene.add(camera())
+        setInitialCameraPosition()
+        targetDistance = camera().position.distanceTo(player.position)
         animate()
 
         window.addEventListener('keydown', handleKeyDown)
@@ -221,7 +233,7 @@ const PlayerCamera: Component = () => {
         window.addEventListener('wheel', handleWheel, { passive: true })
 
         onCleanup(() => {
-            scene.remove(camera)
+            scene.remove(camera())
             controls.dispose()
             window.removeEventListener('keydown', handleKeyDown)
             window.removeEventListener('keyup', handleKeyUp)

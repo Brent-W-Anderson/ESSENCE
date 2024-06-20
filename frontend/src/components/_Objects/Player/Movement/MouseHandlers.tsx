@@ -27,7 +27,7 @@ export const MouseHandlers: Component = () => {
         setMouse(mouseVec)
 
         const raycaster = new Raycaster()
-        raycaster.setFromCamera(mouseVec, camera!)
+        raycaster.setFromCamera(mouseVec, camera()!)
 
         if (isRightClickHeldRef.current) {
             renderer!.domElement.style.cursor = 'grabbing'
@@ -40,7 +40,7 @@ export const MouseHandlers: Component = () => {
         if (!camera) return
 
         const raycaster = new Raycaster()
-        raycaster.setFromCamera(mouse(), camera)
+        raycaster.setFromCamera(mouse(), camera())
 
         const meshChildren = scene!.children.filter(
             child => child instanceof Mesh

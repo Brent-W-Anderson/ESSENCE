@@ -13,7 +13,7 @@ const Renderer: Component<RendererProps> = ({ children }) => {
 
         const animate = () => {
             requestAnimationFrame(animate)
-            renderer.render(scene, camera)
+            renderer.render(scene, camera())
         }
 
         animate()

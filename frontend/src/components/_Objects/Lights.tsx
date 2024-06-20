@@ -31,14 +31,14 @@ const Lights: Component = () => {
         // Adjust the shadow camera properties to cover a larger area
         directionalLight.shadow.camera.near = 1
         directionalLight.shadow.camera.far = 500
-        directionalLight.shadow.camera.left = -100
-        directionalLight.shadow.camera.right = 100
-        directionalLight.shadow.camera.top = 100
-        directionalLight.shadow.camera.bottom = -100
+        directionalLight.shadow.camera.left = -1000
+        directionalLight.shadow.camera.right = 1000
+        directionalLight.shadow.camera.top = 1000
+        directionalLight.shadow.camera.bottom = -1000
 
         // Optional: Increase shadow map size for better quality shadows
-        directionalLight.shadow.mapSize.width = 8192
-        directionalLight.shadow.mapSize.height = 8192
+        directionalLight.shadow.mapSize.width = 40000
+        directionalLight.shadow.mapSize.height = 40000
 
         // Smooth shadows by setting the radius
         directionalLight.shadow.radius = 2

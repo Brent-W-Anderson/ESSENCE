@@ -3,7 +3,7 @@ import { Group, Mesh, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
 
 export interface SceneContextProps {
     scene: Scene
-    camera: PerspectiveCamera
+    camera: Accessor<PerspectiveCamera>
     renderer: WebGLRenderer
     updateMesh: (
         mesh: Group | Mesh,

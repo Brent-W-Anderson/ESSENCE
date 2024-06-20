@@ -16,7 +16,7 @@ import {
     WebGLRenderer
 } from 'three'
 import { SceneContextProps } from './_types'
-import { SCENE, PLAYER } from '@/config'
+import { SCENE } from '@/config'
 
 const SceneContext = createContext<SceneContextProps>()
 
@@ -30,21 +30,21 @@ const [floorRef, setFloorRef] = createSignal<Mesh>()
 const [objectsRef, setObjectsRef] = createSignal<
     { index: number; mesh: Mesh }[]
 >([])
+const [camera, setCamera] = createSignal(
+    new PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        10000 // view distance
+    )
+)
 
 const SceneProvider: Component<{
     children: JSX.Element | JSX.Element[]
 }> = props => {
     const scene = new Scene()
-    const camera = new PerspectiveCamera(
-        75,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        100 // view distance
-    )
     const renderer = new WebGLRenderer({ antialias: true })
-
     scene.background = new Color(0xffffff)
-    camera.position.set(0, PLAYER.CAMERA.distance, 0)
     renderer.setSize(window.innerWidth, window.innerHeight)
 
     const animate = () => {
@@ -54,7 +54,7 @@ const SceneProvider: Component<{
             physicsWorld()?.stepSimulation(1 / 60, 10)
         }
 
-        renderer.render(scene, camera)
+        renderer.render(scene, camera())
     }
 
     const createRigidBody = (
@@ -165,8 +165,8 @@ const SceneProvider: Component<{
         const width = window.innerWidth
         const height = window.innerHeight
         renderer.setSize(width, height)
-        camera.aspect = width / height
-        camera.updateProjectionMatrix()
+        camera().aspect = width / height
+        camera().updateProjectionMatrix()
     }
 
     createEffect(() => {
@@ -180,6 +180,7 @@ const SceneProvider: Component<{
     const store = {
         scene,
         camera,
+        setCamera,
         renderer,
         physicsWorld,
         createRigidBody,

@@ -87,7 +87,7 @@ const PlayerMovement: Component = () => {
         rigidPlayer.getMotionState().getWorldTransform(transform)
 
         const cameraDirection = new Vector3()
-        context.camera.getWorldDirection(cameraDirection)
+        context.camera().getWorldDirection(cameraDirection)
         cameraDirection.y = 0 // Ensure the player stays on the ground plane
         cameraDirection.normalize()
 
@@ -304,6 +304,8 @@ const PlayerMovement: Component = () => {
                 ammo.destroy(jumpVelocity)
                 isJumping = false
             }
+
+            ammo.destroy(currentVelocity)
         }
     }
 
