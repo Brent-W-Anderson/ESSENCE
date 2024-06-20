@@ -1,13 +1,15 @@
 import { Component, onCleanup } from 'solid-js'
 import Stats from 'stats-js'
 
+// TODO: move style to .scss file.
+
 const PerformanceStats: Component = () => {
     const statsInstances: Stats[] = []
 
     const createStatsInstance = (panel: number, position: string) => {
         const stats = new Stats()
         stats.showPanel(panel)
-        stats.dom.style.cssText = `position:absolute;top:0px;left:${position};transform:scale(2);transform-origin:top left;`
+        stats.dom.style.cssText = `position:fixed;bottom:96px;left:${position};transform:scale(2);pointer-events:none;`
         statsInstances.push(stats)
 
         return stats.dom
@@ -33,11 +35,11 @@ const PerformanceStats: Component = () => {
     })
 
     return (
-        <div>
+        <>
             {statsElements.map(element => (
                 <div ref={el => el?.appendChild(element)}></div>
             ))}
-        </div>
+        </>
     )
 }
 

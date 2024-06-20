@@ -1,7 +1,6 @@
 import { Component, Suspense } from 'solid-js'
 import Cube from '@/components/_Objects/Cube'
 import Floor from '@/components/_Objects/Floor'
-import PerformanceStats from '@/components/_Objects/Helpers/PerformanceStats'
 import Lights from '@/components/_Objects/Lights'
 import PlayerCamera from '@/components/_Objects/Player/Camera'
 import PlayerMovement from '@/components/_Objects/Player/Movement'
@@ -22,9 +21,6 @@ const HomePage: Component = () => {
             }
         >
             <h1>Player Controller</h1>
-
-            {/* HELPERS */}
-            <PerformanceStats />
 
             <Renderer>
                 {/* OBJECTS */}

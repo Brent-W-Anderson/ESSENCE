@@ -12,6 +12,9 @@ import {
 import { useSceneContext } from '@/components/_Scene/Context'
 import { HELPERS } from '@/config'
 
+// TODO: add functionality for ctrl + hover & left-click to lock the coordinates visibility = true.
+// this should still only stay visible under a distance of <= 50.
+
 const Coordinates: Component<{
     mesh: Object3D
     helper: Group
@@ -33,6 +36,7 @@ const Coordinates: Component<{
     const { camera, scene } = useSceneContext()!
     let visible = alwaysVisible
     let sprite: Sprite
+    let ctrlKeyPressed = false
 
     const parentBoundingBox = new Box3().setFromObject(mesh)
     const parentHeight = parentBoundingBox.max.y - parentBoundingBox.min.y
@@ -112,7 +116,7 @@ const Coordinates: Component<{
                 : COORDINATES.height
             sprite.position.set(
                 0,
-                halfHeight + scaledHeight + (arrows ? 1 : 0),
+                halfHeight + scaledHeight + (arrows ? 1 : 0.2),
                 0
             )
         }
@@ -137,18 +141,15 @@ const Coordinates: Component<{
             const raycaster = new Raycaster()
             const mouse = new Vector2()
 
-            const onMouseMove = (event: MouseEvent) => {
-                mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+            const checkIntersection = () => {
                 raycaster.setFromCamera(mouse, camera())
-
                 const intersectsMesh = raycaster.intersectObject(mesh, true)
                 const intersectsCoordinatesGroup = raycaster.intersectObject(
                     helper,
                     true
                 )
 
-                if (intersectsMesh.length > 0) {
+                if (ctrlKeyPressed && intersectsMesh.length > 0) {
                     visible = true
                     hovered = true
                 } else if (hovered && intersectsCoordinatesGroup.length > 0) {
@@ -161,10 +162,36 @@ const Coordinates: Component<{
                 sprite.visible = visible
             }
 
+            const onMouseMove = (event: MouseEvent) => {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+                checkIntersection()
+            }
+
+            const onKeyDown = (event: KeyboardEvent) => {
+                if (event.key === 'Control') {
+                    ctrlKeyPressed = true
+                    checkIntersection()
+                }
+            }
+
+            const onKeyUp = (event: KeyboardEvent) => {
+                if (event.key === 'Control') {
+                    ctrlKeyPressed = false
+                    hovered = false
+                    visible = false
+                    sprite.visible = false
+                }
+            }
+
             window.addEventListener('mousemove', onMouseMove)
+            window.addEventListener('keydown', onKeyDown)
+            window.addEventListener('keyup', onKeyUp)
 
             onCleanup(() => {
                 window.removeEventListener('mousemove', onMouseMove)
+                window.removeEventListener('keydown', onKeyDown)
+                window.removeEventListener('keyup', onKeyUp)
             })
         }
 

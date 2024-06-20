@@ -4,15 +4,17 @@
 
 ### TODO:
 
-#### - fix bug - where floating the camera angles doesn't adjust with cameraFloatEasing (the little bit the camera eases with the player movement causes that small little snap when starting an initial rotation).
-
-#### - fix bug - where at max zoom-out of camera, then the camera shouldn't attempt to go further.
+#### - only allow left-click on canvas to select a target location to move to.
 
 #### - fix bug - where player can't move around and continuously jump while holding the space-bar.
 
 #### - add queueing a jump if space-bar is pressed in the middle of a jump.
 
 #### - allow jumping in the middle of a ledge bump.
+
+#### - fix bug - where adjusting the rotation with cameraFloatEasing > 0 (the little bit the camera eases with the player movement causes that small little snap when starting an initial rotation).
+
+#### - fix bug - where at max zoom-out of camera, then the camera shouldn't attempt to go further.
 
 #### - allow AxisArrows to drag objects around the scene.
 

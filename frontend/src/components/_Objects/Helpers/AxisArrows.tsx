@@ -11,6 +11,9 @@ import {
 import { useSceneContext } from '@/components/_Scene/Context'
 import { HELPERS } from '@/config'
 
+// TODO: add functionality for ctrl + hover & left-click to lock the coordinates visibility = true.
+// this should still only stay visible under a distance of <= 50.
+
 const AxisArrows: Component<{
     mesh: Object3D
     helper: Group
@@ -34,6 +37,7 @@ const AxisArrows: Component<{
     scene.add(helper)
 
     let arrowX: ArrowHelper, arrowY: ArrowHelper, arrowZ: ArrowHelper
+    let ctrlKeyPressed = false
 
     const updateArrowsScale = () => {
         const distance = camera().position.distanceTo(mesh.position)
@@ -41,6 +45,32 @@ const AxisArrows: Component<{
         arrowX.setLength(2 * scale, 0.5 * scale, 0.2 * scale)
         arrowY.setLength(2 * scale, 0.5 * scale, 0.2 * scale)
         arrowZ.setLength(2 * scale, 0.5 * scale, 0.2 * scale)
+    }
+
+    let hovered = false
+    const checkIntersection = (mouse: Vector2) => {
+        const raycaster = new Raycaster()
+        raycaster.setFromCamera(mouse, camera())
+        const intersectsMesh = raycaster.intersectObject(mesh, true)
+        const intersectsArrowGroup = raycaster.intersectObject(helper, true)
+
+        const distance = camera().position.distanceTo(mesh.position)
+        if (ctrlKeyPressed && intersectsMesh.length > 0 && distance <= 50) {
+            setVisible(true)
+            hovered = true
+        } else if (
+            hovered &&
+            intersectsArrowGroup.length > 0 &&
+            distance <= 50
+        ) {
+            setVisible(true)
+        } else {
+            setVisible(false)
+            hovered = false
+        }
+
+        const arrows = showArrows ? [arrowX, arrowY, arrowZ] : []
+        arrows.forEach(arrow => (arrow.visible = visible()))
     }
 
     onMount(() => {
@@ -71,7 +101,6 @@ const AxisArrows: Component<{
         if (showArrows) helper.add(arrowZ)
 
         const arrows = showArrows ? [arrowX, arrowY, arrowZ] : []
-        let hovered = false
 
         // Set arrows visibility based on the alwaysVisible prop
         arrows.forEach(arrow => (arrow.visible = alwaysVisible))
@@ -89,42 +118,38 @@ const AxisArrows: Component<{
 
         if (!alwaysVisible) {
             // Raycaster setup for mouse hover detection
-            const raycaster = new Raycaster()
             const mouse = new Vector2()
 
             const onMouseMove = (event: MouseEvent) => {
                 mouse.x = (event.clientX / window.innerWidth) * 2 - 1
                 mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
-                raycaster.setFromCamera(mouse, camera())
+                checkIntersection(mouse)
+            }
 
-                const intersectsMesh = raycaster.intersectObject(mesh, true)
-                const intersectsArrowGroup = raycaster.intersectObject(
-                    helper,
-                    true
-                )
-
-                const distance = camera().position.distanceTo(mesh.position)
-                if (intersectsMesh.length > 0 && distance <= 50) {
-                    setVisible(true)
-                    hovered = true
-                } else if (
-                    hovered &&
-                    intersectsArrowGroup.length > 0 &&
-                    distance <= 50
-                ) {
-                    setVisible(true)
-                } else {
-                    setVisible(false)
-                    hovered = false
+            const onKeyDown = (event: KeyboardEvent) => {
+                if (event.key === 'Control') {
+                    ctrlKeyPressed = true
+                    checkIntersection(mouse)
                 }
+            }
 
-                arrows.forEach(arrow => (arrow.visible = visible()))
+            const onKeyUp = (event: KeyboardEvent) => {
+                if (event.key === 'Control') {
+                    ctrlKeyPressed = false
+                    hovered = false
+                    setVisible(false)
+                    arrows.forEach(arrow => (arrow.visible = visible()))
+                }
             }
 
             window.addEventListener('mousemove', onMouseMove)
+            window.addEventListener('keydown', onKeyDown)
+            window.addEventListener('keyup', onKeyUp)
 
             onCleanup(() => {
                 window.removeEventListener('mousemove', onMouseMove)
+                window.removeEventListener('keydown', onKeyDown)
+                window.removeEventListener('keyup', onKeyUp)
             })
         }
 
