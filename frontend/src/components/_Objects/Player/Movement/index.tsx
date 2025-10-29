@@ -14,6 +14,7 @@ import { PLAYER } from '@/config'
 
 // TODO: split off key-bindings into their own component,
 // just like the MouseHandlers.
+// also split off the ray lines/bump logic.
 
 const PlayerMovement: Component = () => {
     const context = useSceneContext()!
@@ -469,11 +470,10 @@ const PlayerMovement: Component = () => {
         rigidPlayer.getMotionState().getWorldTransform(transform)
         const origin = transform.getOrigin()
         const currentPosition = new Vector3(origin.x(), origin.y(), origin.z())
-
-        movePlayer()
-
         const { directionToTarget, distanceToTarget } =
             calculateDirectionToTarget(currentPosition)
+
+        movePlayer()
         applyMovementForce(directionToTarget, distanceToTarget, ammo!)
         applyRotation(directionToTarget, distanceToTarget, ammo!)
         applyJumpForce(ammo!)

@@ -3,7 +3,7 @@ import { Box3, Mesh, Raycaster, Vector2 } from 'three'
 import { usePlayerMovementContext } from './Context'
 import { useSceneContext } from '@/components/_Scene/Context'
 
-// TODO: add applyMovementForce() & applyRotation() to the MouseHanglers,
+// TODO: add applyMovementForce() & applyRotation() to the MouseHandlers,
 // since this belongs with the mouse logic.
 
 export const MouseHandlers: Component = () => {
