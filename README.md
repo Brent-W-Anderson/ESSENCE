@@ -4,6 +4,8 @@
 
 ### TODO:
 
+#### - when holding right-click to grab the screen while moving the character with W,A,S,D and going outside of the window before un-clicking will cause the character to keep moving in that direction until that key is pressed again. - solution - default W,A,S,D key state back to un-pressed, so the character stops moving when the mouse leaves the window.
+
 #### - only allow left-click on canvas to select a target location to move to.
 
 #### - fix bug - where player can't move around and continuously jump while holding the space-bar.
