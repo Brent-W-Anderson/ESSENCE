@@ -1,12 +1,12 @@
 <h3 style="font-size: 2em" align="center">
-    $${\color{#9AA6B2} \text{【ESSENCE】}}$$
+    $${\color{#9AA6B2} \text{【 ESSENCE 】}}$$
 </h3>
 
 ---
 
 <!------------------------------------------------------------------------------------->
 
-### $${\color{#9AA6B2} \text{REPOS}}$$
+#### $${\color{#9AA6B2} \text{REPOS}}$$
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 🔹[**API**](https://github.com/Brent-W-Anderson/ESSENCE/tree/main/backend)
@@ -22,7 +22,7 @@ UI components, styles, and client-side logic.
 
 <!------------------------------------------------------------------------------------->
 
-### $${\color{#9AA6B2} \text{BUG FIXES/TODOs}}$$
+#### $${\color{#9AA6B2} \text{BUG FIXES/TODOs}}$$
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 🔹Add changelog & versioning list-page to project (this should keep track of dates and times at each version), so there can be a list when creating new builds and can keep track of changes when they happened.

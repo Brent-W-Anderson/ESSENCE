@@ -1,5 +1,5 @@
 <h3 style="font-size: 2em" align="center">
-    $${\color{#9AA6B2} \text{【ESSENCE】}}$$
+    $${\color{#9AA6B2} \text{【 ESSENCE 】}}$$
 </h3>
 
 ---
@@ -12,7 +12,7 @@
 
 <!------------------------------------------------------------------------------------->
 
-### $${\color{#9AA6B2} \text{REPOS}}$$
+#### $${\color{#9AA6B2} \text{REPOS}}$$
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 🔹[**APP**](https://github.com/Brent-W-Anderson/ESSENCE/tree/main)
@@ -28,7 +28,7 @@ API endpoints, database interactions, and server logic.
 
 <!------------------------------------------------------------------------------------->
 
-### $${\color{#9AA6B2} \text{BUG FIXES/TODOs}}$$
+#### $${\color{#9AA6B2} \text{BUG FIXES/TODOs}}$$
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 🔹When holding right-click to grab the screen while
