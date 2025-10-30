@@ -1,11 +1,13 @@
-# SOLID-JS
+<h1 align="center">
+    【ESSENCE】
+</h1>
 
-## REPOS
+### $${\color{#9AA6B2} \text{REPOS}}$$
 
-### CLIENT ➜ See the [Frontend README](./frontend/README.md)
+&nbsp;&nbsp;&nbsp;&nbsp; 🔹[**API**](./backend/README.md) (Backend Development)
+➜ This repo contains all backend-related code, including API endpoints, database
+interactions, and server logic.
 
-### API ➜ Or the [Backend README](./backend/README.md)
-
-## SETUP:
-
-### add setup here...
+&nbsp;&nbsp;&nbsp;&nbsp; 🔹[**CLIENT**](./frontend/README.md) (Frontend
+Development) ➜ This repo contains all frontend-related code, including UI
+components, styles, and client-side logic.
