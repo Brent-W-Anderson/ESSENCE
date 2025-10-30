@@ -1,27 +1,13 @@
 # SOLID-JS
 
-## FRONTEND
+## REPOS
 
-### TODO:
+### CLIENT ➜ See the [Frontend README](./frontend/README.md)
 
-#### - when holding right-click to grab the screen while moving the character with W,A,S,D and going outside of the window before un-clicking will cause the character to keep moving in that direction until that key is pressed again. - solution - default W,A,S,D key state back to un-pressed, so the character stops moving when the mouse leaves the window.
+## API
 
-#### - only allow left-click on canvas to select a target location to move to.
+### API ➜ Or the [Backend README](./backend/README.md)
 
-#### - fix bug - where player can't move around and continuously jump while holding the space-bar.
+## SETUP:
 
-#### - add queueing a jump if space-bar is pressed in the middle of a jump.
-
-#### - allow jumping in the middle of a ledge bump.
-
-#### - fix bug - where adjusting the rotation with cameraFloatEasing > 0 (the little bit the camera eases with the player movement causes that small little snap when starting an initial rotation).
-
-#### - fix bug - where at max zoom-out of camera, then the camera shouldn't attempt to go further.
-
-#### - allow AxisArrows to drag objects around the scene.
-
-#### - split up PlayerMovement component more. -- start with key-bindings, since mouse-bindings are done.
-
-#### - player shouldn't try and walk through objects if they're in the direct line to the target destination (add smart pathing).
-
-#### - tapping shift should allow the player to lock his direction facing with the camera. A & D should now move 90 degrees sideways instead of walking towards that direction. S will walk backwards at 2/3 the speed, but still face forwards in the same direction as the camera. -- mouse click alternatives can work the same way.
+### add setup here...
