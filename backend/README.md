@@ -1,11 +1,10 @@
 <h1 align="center">
     【ESSENCE】
-    <br />
 </h1>
 
 <!------------------------------------------------------------------------------------->
 
-## BACKEND
+## $${\color{#9AA6B2} \text{BACKEND}}$$
 
 <!------------------------------------------------------------------------------------->
 
@@ -23,7 +22,7 @@ API endpoints, database interactions, and server logic.
 
 <!------------------------------------------------------------------------------------->
 
-### BUG FIXES/TODOs:
+### $${\color{#9AA6B2} \text{BUG FIXES/TODOs}}$$
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 🔹Start creating a database, so we can keep track of in-game character stats/items/progression/etc.

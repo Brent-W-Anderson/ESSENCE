@@ -1,11 +1,10 @@
 <h1 align="center">
     【ESSENCE】
-    <br />
 </h1>
 
 <!------------------------------------------------------------------------------------->
 
-## FRONTEND
+## $${\color{#9AA6B2} \text{FRONTEND}}$$
 
 <!------------------------------------------------------------------------------------->
 
@@ -23,7 +22,7 @@ API endpoints, database interactions, and server logic.
 
 <!------------------------------------------------------------------------------------->
 
-### BUG FIXES/TODOs:
+### $${\color{#9AA6B2} \text{BUG FIXES/TODOs}}$$
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 🔹When holding right-click to grab the screen while
