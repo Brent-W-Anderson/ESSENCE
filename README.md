@@ -4,8 +4,6 @@
 
 ### CLIENT ➜ See the [Frontend README](./frontend/README.md)
 
-## API
-
 ### API ➜ Or the [Backend README](./backend/README.md)
 
 ## SETUP:
