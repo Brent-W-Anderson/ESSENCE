@@ -20,6 +20,8 @@ UI components, styles, and client-side logic.
 (Backend Development) ➜ This repo contains all backend-related code, including
 API endpoints, database interactions, and server logic.
 
+---
+
 <!------------------------------------------------------------------------------------->
 
 ### $${\color{#9AA6B2} \text{BUG FIXES/TODOs}}$$

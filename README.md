@@ -16,6 +16,8 @@ API endpoints, database interactions, and server logic.
 (Frontend Development) ➜ This repo contains all frontend-related code, including
 UI components, styles, and client-side logic.
 
+---
+
 <!------------------------------------------------------------------------------------->
 
 ### $${\color{#9AA6B2} \text{BUG FIXES/TODOs}}$$
