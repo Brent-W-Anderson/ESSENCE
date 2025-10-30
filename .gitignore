@@ -1,5 +1,6 @@
-**/dist/*
 **/node_modules/*
+**/dist/*
+**/.env/*
 
 .yarn/*
 !.yarn/patches

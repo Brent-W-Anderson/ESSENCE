@@ -1,20 +1,58 @@
 {
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "always"
+    // UI Preferences
+    "workbench.colorTheme": "Default Dark+",
+
+    // Editor Behavior
+    "editor.detectIndentation": false,
+    "editor.formatOnSave": true,
+
+    // Formatting Defaults (TS, JS, JSON)
+    "[typescript]": { "editor.defaultFormatter": "dbaeumer.vscode-eslint" },
+    "[javascript]": { "editor.defaultFormatter": "dbaeumer.vscode-eslint" },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
     },
-    "eslint.validate": [
-        "javascript",
-        "javascriptreact",
-        "typescript",
-        "typescriptreact"
-    ],
-    "eslint.workingDirectories": [{ "mode": "auto" }],
-    "search.exclude": {
-        "**/.yarn": true,
-        "**/.pnp.*": true
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
     },
-    "typescript.tsdk": "./node_modules/typescript/lib",
-    "typescript.enablePromptUseWorkspaceTsdk": true,
-    "eslint.nodePath": "./node_modules",
-    "prettier.prettierPath": "./node_modules/prettier"
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features",
+        "files.insertFinalNewline": true
+    },
+    "[svg]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+
+    // Automatically apply ESLint fixes on save
+    "editor.codeActionsOnSave": ["source.fixAll"],
+
+    // Prettier Configuration
+    "prettier.tabWidth": 4,
+    "prettier.useTabs": true,
+    "prettier.semi": false,
+    "prettier.singleQuote": true,
+    "prettier.bracketSameLine": true,
+    "prettier.jsxSingleQuote": true,
+    "prettier.arrowParens": "avoid",
+
+    // JavaScript Formatting Rules
+    "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": true,
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+
+    // TypeScript Formatting Rules (Consistent with JS)
+    "typescript.format.insertSpaceBeforeFunctionParenthesis": true,
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": true,
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+
+    // Associate file extensions with correct language modes
+    "files.associations": {
+        "*.ts": "typescript",
+        "*.tsx": "typescriptreact",
+        "*.svg": "xml"
+    },
+
+    "workbench.editorAssociations": { "*.svg": "default" },
+
+    // Ensure final newlines in non-code files are disabled
+    "files.insertFinalNewline": false
 }

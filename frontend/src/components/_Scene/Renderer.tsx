@@ -5,15 +5,15 @@ type RendererProps = {
     children?: JSX.Element | JSX.Element[]
 }
 
-const Renderer: Component<RendererProps> = ({ children }) => {
+const Renderer: Component<RendererProps> = ( { children } ) => {
     const { scene, camera, renderer } = useSceneContext()!
 
-    createEffect(() => {
+    createEffect( () => {
         renderer.shadowMap.enabled = true
 
         const animate = () => {
-            requestAnimationFrame(animate)
-            renderer.render(scene, camera())
+            requestAnimationFrame( animate )
+            renderer.render( scene, camera() )
         }
 
         animate()
@@ -21,7 +21,7 @@ const Renderer: Component<RendererProps> = ({ children }) => {
         return () => {
             renderer.dispose()
         }
-    })
+    } )
 
     return (
         <>

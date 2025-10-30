@@ -20,6 +20,7 @@
     "devDependencies": {
         "@types/node": "^24.9.2",
         "@types/three": "^0.180.0",
+        "ammojs-typed": "^1.0.6",
         "empty-module": "^0.0.2",
         "postcss": "^8.4.38",
         "rollup-plugin-visualizer": "^6.0.5",

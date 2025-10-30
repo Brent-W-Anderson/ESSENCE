@@ -1,10 +1,12 @@
 {
-    "singleQuote": true,
-    "useTabs": false,
+    "plugins": [
+        "prettier-plugin-sort-json"
+    ],
     "semi": false,
-    "printWidth": 80,
-    "tabWidth": 4,
-    "endOfLine": "crlf",
-    "arrowParens": "avoid",
-    "trailingComma": "none"
+    "singleQuote": true,
+    "proseWrap": "always",
+    "trailingComma": "none",
+    "arrowParens": "always",
+    "endOfLine": "lf",
+    "tabWidth": 4
 }

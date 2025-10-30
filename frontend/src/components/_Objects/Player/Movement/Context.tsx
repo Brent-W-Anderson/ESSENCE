@@ -11,18 +11,16 @@ import { PlayerMovementContextProps } from './_types'
 const PlayerMovementContext = createContext<PlayerMovementContextProps>()
 
 export const usePlayerMovementContext = () => {
-    const context = useContext(PlayerMovementContext)
-    if (!context) {
-        throw new Error(
-            'usePlayerMovementContext must be used within a PlayerMovementProvider'
-        )
+    const context = useContext( PlayerMovementContext )
+    if ( !context ) {
+        throw new Error( 'usePlayerMovementContext must be used within a PlayerMovementProvider' )
     }
     return context
 }
 
 const PlayerMovementProvider: Component<{ children: JSX.Element }> = props => {
-    const [mouse, setMouse] = createSignal(new Vector2(0, 0))
-    const [pointer, setPointer] = createSignal<Object3D | null>(null)
+    const [mouse, setMouse] = createSignal( new Vector2( 0, 0 ) )
+    const [pointer, setPointer] = createSignal<Object3D | null>( null )
     const targetPos = new Vector3()
     const intervalIdRef = { current: null as number | null }
     const isRightClickHeldRef = { current: false }
@@ -37,10 +35,10 @@ const PlayerMovementProvider: Component<{ children: JSX.Element }> = props => {
     let movementTimeout: number | null = null
     let canJumpTimeout: number | null = null
 
-    const [rayLines, setRayLines] = createSignal<Line[]>([])
+    const [rayLines, setRayLines] = createSignal<Line[]>( [] )
     let updateTargetPosition = () => {}
 
-    const setUpdateTargetPosition = (fn: () => void) => {
+    const setUpdateTargetPosition = ( fn: () => void ) => {
         updateTargetPosition = fn
     }
 

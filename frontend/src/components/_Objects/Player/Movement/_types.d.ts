@@ -1,22 +1,22 @@
 import { Vector2, Vector3, Object3D, Line } from 'three'
 
 export interface PlayerMovementContextProps {
-    mouse: [() => Vector2, (value: Vector2) => void]
-    pointer: [() => Object3D | null, (value: Object3D | null) => void]
-    targetPos: Vector3
-    isWKeyDown: boolean
+    canJump: boolean
+    canJumpTimeout: number | null
+    intervalIdRef: { current: number | null }
     isAKeyDown: boolean
-    isSKeyDown: boolean
     isDKeyDown: boolean
     isJumping: boolean
-    canJump: boolean
+    isRightClickHeldRef: { current: boolean }
+    isSKeyDown: boolean
+    isWKeyDown: boolean
     lastJumpPressTime: number
     lastPosition: Vector3
+    mouse: [() => Vector2, ( value: Vector2 ) => void]
     movementTimeout: number | null
-    canJumpTimeout: number | null
-    rayLines: [() => Line[], (value: Line[]) => void]
-    intervalIdRef: { current: number | null }
-    isRightClickHeldRef: { current: boolean }
+    pointer: [() => Object3D | null, ( value: Object3D | null ) => void]
+    rayLines: [() => Line[], ( value: Line[] ) => void]
+    setUpdateTargetPosition: ( fn: () => void ) => void
+    targetPos: Vector3
     updateTargetPosition: () => void
-    setUpdateTargetPosition: (fn: () => void) => void
 }

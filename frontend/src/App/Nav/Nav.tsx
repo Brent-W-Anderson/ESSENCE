@@ -5,7 +5,7 @@ import PerformanceStats from '@/components/_Objects/Helpers/PerformanceStats'
 
 const { ROUTE, NAV } = COPY
 
-const Nav = ({ children }: { children?: JSX.Element | JSX.Element[] }) => (
+const Nav = ( { children }: { children?: JSX.Element | JSX.Element[] } ) => (
     <>
         <PerformanceStats />
 

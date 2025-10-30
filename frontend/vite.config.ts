@@ -17,7 +17,7 @@ export default defineConfig( {
         } ),
         visualizer( {
             filename: '../dist/frontend/stats.html',
-            open: false,
+            open: false
         } ),
         viteCompression( {
             algorithm: 'gzip',

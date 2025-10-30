@@ -2,14 +2,14 @@ import { Router } from '@solidjs/router'
 import { lazy } from 'solid-js'
 import { Suspense, render } from 'solid-js/web'
 
-const Nav = lazy(() => import('./App/Nav/Nav'))
-const Pages = lazy(() => import('./App/Pages/Pages'))
+const Nav = lazy( () => import( './App/Nav/Nav' ) )
+const Pages = lazy( () => import( './App/Pages/Pages' ) )
 
-const root = document.createElement('div')
+const root = document.createElement( 'div' )
 root.id = 'APP'
 
 document.body.innerHTML = ''
-document.body.appendChild(root)
+document.body.appendChild( root )
 
 const App = () => (
     <Suspense
@@ -25,4 +25,4 @@ const App = () => (
     </Suspense>
 )
 
-render(App, root)
+render( App, root )

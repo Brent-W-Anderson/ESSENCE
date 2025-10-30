@@ -3,30 +3,34 @@ import { BoxGeometry, Mesh, MeshStandardMaterial, PlaneGeometry } from 'three'
 import { useSceneContext } from '@/components/_Scene/Context'
 
 const Floor: Component = () => {
-    const { scene, physicsWorld, createRigidBody, setFloorRef } =
-        useSceneContext()!
+    const { scene, physicsWorld, createRigidBody, setFloorRef }
+        = useSceneContext()!
     let floor: Mesh | null = null
 
-    onMount(() => {
-        const floorGeometry = new PlaneGeometry(1000, 1000)
-        const floorMaterial = new MeshStandardMaterial({
+    onMount( () => {
+        const floorGeometry = new PlaneGeometry( 1000, 1000 )
+        const floorMaterial = new MeshStandardMaterial( {
             color: 0xcccccc
-        })
+        } )
 
-        floor = new Mesh(floorGeometry, floorMaterial)
+        floor = new Mesh( floorGeometry, floorMaterial )
         floor.rotation.x = -Math.PI / 2
         floor.receiveShadow = true
 
-        scene.add(floor)
+        scene.add( floor )
 
-        setFloorRef?.(floor)
+        setFloorRef?.( floor )
 
-        const rigid = createRigidBody(floor, 0, {
+        const rigid = createRigidBody( floor, 0, {
             width: 500,
             height: 500,
             depth: 0
-        })
-        rigid && physicsWorld && physicsWorld()?.addRigidBody(rigid)
+        } )
+        const world = physicsWorld?.()
+
+        if ( rigid && world ) {
+            world.addRigidBody( rigid )
+        }
 
         const createWall = (
             width: number,
@@ -36,23 +40,26 @@ const Floor: Component = () => {
             y: number,
             z: number
         ) => {
-            const wallGeometry = new BoxGeometry(width, height, depth)
-            const wallMaterial = new MeshStandardMaterial({
+            const wallGeometry = new BoxGeometry( width, height, depth )
+            const wallMaterial = new MeshStandardMaterial( {
                 color: 0x333333
-            })
+            } )
 
-            const wall = new Mesh(wallGeometry, wallMaterial)
-            wall.position.set(x, y, z)
+            const wall = new Mesh( wallGeometry, wallMaterial )
+            wall.position.set( x, y, z )
             wall.receiveShadow = true
             wall.castShadow = true
-            scene.add(wall)
+            scene.add( wall )
 
-            const wallRigid = createRigidBody(wall, 0, {
+            const wallRigid = createRigidBody( wall, 0, {
                 width: width / 2,
                 height: height / 2,
                 depth: depth / 2
-            })
-            wallRigid && physicsWorld && physicsWorld()?.addRigidBody(wallRigid)
+            } )
+
+            if ( wallRigid && world ) {
+                world.addRigidBody( wallRigid )
+            }
 
             return wall
         }
@@ -97,19 +104,22 @@ const Floor: Component = () => {
         ]
 
         return () => {
-            if (floor) {
-                scene.remove(floor)
-                rigid && physicsWorld && physicsWorld()?.removeRigidBody(rigid)
+            if ( floor ) {
+                scene.remove( floor )
+
+                if ( rigid && world ) {
+                    world.removeRigidBody( rigid )
+                }
             }
-            walls.forEach(wall => {
-                scene.remove(wall)
+            walls.forEach( wall => {
+                scene.remove( wall )
                 const wallRigid = wall.userData.physicsBody
-                wallRigid &&
-                    physicsWorld &&
-                    physicsWorld()?.removeRigidBody(wallRigid)
-            })
+                if ( wallRigid && world ) {
+                    world.removeRigidBody( wallRigid )
+                }
+            } )
         }
-    })
+    } )
 
     return null
 }
