@@ -1,6 +1,6 @@
-<h1 align="center">
+<h2 align="center">
     $${\color{#9AA6B2} \text{【ESSENCE】}}$$
-</h1>
+</h2>
 
 ---
 
