@@ -3,10 +3,11 @@ import { lazy, Suspense } from 'solid-js'
 import style from './Pages.module.scss'
 import COPY from '@/assets/COPY'
 
+const GamePage = lazy( () => import( './Game/Game' ) )
 const HomePage = lazy( () => import( './Home/Home' ) )
 const SceneProvider = lazy( () => import( '@/components/_Scene/Context' ) )
 
-const { HOME } = COPY.ROUTE
+const { HOME, GAME } = COPY.ROUTE
 
 const Pages = () => (
     <Suspense
@@ -20,8 +21,18 @@ const Pages = () => (
             path={HOME}
             component={() => (
                 <div class={style.page}>
+                    <HomePage />
+                </div>
+            )}
+        />
+
+        <Route
+            path={GAME}
+            component={() => (
+                <div class={style.page}>
                     <SceneProvider>
-                        <HomePage />
+                        <div />
+                        <GamePage />
                     </SceneProvider>
                 </div>
             )}

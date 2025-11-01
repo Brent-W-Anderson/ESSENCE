@@ -1,4 +1,4 @@
-import { createEffect, Component, createSignal } from 'solid-js'
+import { createEffect, Component, createSignal, onCleanup } from 'solid-js'
 import { AmbientLight, DirectionalLight, Vector3 } from 'three'
 import { useSceneContext } from '../_Scene/Context'
 
@@ -17,10 +17,12 @@ const Lights: Component = () => {
         return new Vector3( x, y, z )
     }
 
+    let rafId: number | null = null
     const animateLight = () => {
         setTime( Date.now() )
-        requestAnimationFrame( animateLight )
+        rafId = requestAnimationFrame( animateLight )
     }
+    rafId = requestAnimationFrame( animateLight )
 
     createEffect( () => {
         const ambientLight = new AmbientLight( 0xffffff, 0.5 )
@@ -46,12 +48,11 @@ const Lights: Component = () => {
         scene.add( ambientLight )
         scene.add( directionalLight )
 
-        animateLight()
-
-        return () => {
+        onCleanup( () => {
+            if ( rafId !== null ) cancelAnimationFrame( rafId )
             scene.remove( ambientLight )
             scene.remove( directionalLight )
-        }
+        } )
     } )
 
     createEffect( () => {

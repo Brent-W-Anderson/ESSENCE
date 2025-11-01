@@ -10,7 +10,11 @@ const Nav = ( { children }: { children?: JSX.Element | JSX.Element[] } ) => (
         <PerformanceStats />
 
         <nav id={style.NAV}>
-            <a href={ROUTE.HOME}>{NAV.HOME}</a>
+            <div class={style.links}>
+                <a href={ROUTE.HOME}>{NAV.HOME}</a>
+                <a href={ROUTE.GAME}>{NAV.GAME}</a>
+            </div>
+
             <div class={style.icon}>{NAV.SETTINGS()}</div>
         </nav>
 

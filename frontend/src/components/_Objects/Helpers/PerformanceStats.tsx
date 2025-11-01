@@ -22,15 +22,16 @@ const PerformanceStats: Component = () => {
     ]
 
     // Update stats on each frame
+    let rafId: number | null = null
     const animate = () => {
-        statsInstances.forEach( stats => stats.begin() )
-        statsInstances.forEach( stats => stats.end() )
-        requestAnimationFrame( animate )
+        statsInstances.forEach( s => s.begin() )
+        statsInstances.forEach( s => s.end() )
+        rafId = requestAnimationFrame( animate )
     }
-
-    requestAnimationFrame( animate )
+    rafId = requestAnimationFrame( animate )
 
     onCleanup( () => {
+        if ( rafId !== null ) cancelAnimationFrame( rafId )
         statsInstances.forEach( stats => stats.dom.remove() )
     } )
 

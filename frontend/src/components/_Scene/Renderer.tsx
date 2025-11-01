@@ -1,4 +1,4 @@
-import { createEffect, Component, JSX } from 'solid-js'
+import { createEffect, Component, JSX, onCleanup } from 'solid-js'
 import { useSceneContext } from './Context'
 
 type RendererProps = {
@@ -11,16 +11,17 @@ const Renderer: Component<RendererProps> = ( { children } ) => {
     createEffect( () => {
         renderer.shadowMap.enabled = true
 
+        let rafId: number | null = null
         const animate = () => {
-            requestAnimationFrame( animate )
+            rafId = requestAnimationFrame( animate )
             renderer.render( scene, camera() )
         }
-
         animate()
 
-        return () => {
-            renderer.dispose()
-        }
+        onCleanup( () => {
+            if ( rafId !== null ) cancelAnimationFrame( rafId )
+            renderer.setAnimationLoop( null )
+        } )
     } )
 
     return (

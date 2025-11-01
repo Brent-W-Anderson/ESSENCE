@@ -1,5 +1,6 @@
 export type Styles = {
     icon: string
+    links: string
     NAV: string
 }
 

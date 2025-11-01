@@ -1,5 +1,13 @@
 import compression from 'compression'
 import express from 'express'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath( import.meta.url )
+const __dirname = path.dirname( __filename )
+
+// Absolute path to your built frontend
+const root = path.resolve( __dirname, '../dist/frontend' )
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -8,7 +16,7 @@ const PORT = process.env.PORT || 5000
 app.use( compression() )
 
 // Serve static files from the frontend's dist directory
-app.use( express.static( '../dist/frontend', {
+app.use( express.static( root, {
     setHeaders: ( res, filePath ) => {
         if ( filePath.endsWith( '.gz' ) ) {
             res.setHeader( 'Content-Encoding', 'gzip' )
@@ -20,8 +28,8 @@ app.use( express.static( '../dist/frontend', {
 } ) )
 
 // Fallback to index.html for SPA
-app.get( '*', ( _, res ) => {
-    res.sendFile( '/dist/frontend/index.html' )
+app.get( /.*/, ( _req, res ) => {
+    res.sendFile( path.join( root, 'index.html' ) )
 } )
 
 app.listen( PORT, () => {

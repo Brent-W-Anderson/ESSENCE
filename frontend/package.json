@@ -5,7 +5,7 @@
     "scripts": {
         "start": "yarn build:css && npx concurrently \"yarn vite\" \"yarn generate:scss-types\"",
         "build": "vite build && yarn build:css",
-        "build:css": "sass --no-source-map \"src/index.scss\" \"../dist/frontend/assets/css/index.css\"",
+        "build:css": "sass --no-source-map \"src/index.scss\" \"public/assets/css/index.css\"",
         "generate:scss-types": "typed-scss-modules \"src/**/*.module.scss\" --exportType default --nameFormat none -w"
     },
     "dependencies": {
@@ -20,7 +20,6 @@
     "devDependencies": {
         "@types/node": "^24.9.2",
         "@types/three": "^0.180.0",
-        "ammojs-typed": "^1.0.6",
         "empty-module": "^0.0.2",
         "postcss": "^8.4.38",
         "rollup-plugin-visualizer": "^6.0.5",

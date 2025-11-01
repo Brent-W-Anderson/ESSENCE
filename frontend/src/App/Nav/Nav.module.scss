@@ -9,8 +9,14 @@ $icon-size: 28px;
     padding: 24px;
     gap: 24px;
 
-    a {
-        pointer-events: all;
+    .links {
+        display: flex;
+        justify-content: space-between;
+        gap: 40px;
+
+        a {
+            pointer-events: all;
+        }
     }
 
     .icon {

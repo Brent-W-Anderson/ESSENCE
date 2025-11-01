@@ -24,7 +24,7 @@ export const PLAYER_CAMERA = {
 export const PLAYER_MOVEMENT_INDICATOR = {
     // how long the targeted location will stay active (while not moving).
     threshold: 1000,
-    ringColor: 0x00ff00,
+    ringColor: 0x7700ff,
     ringThickness: 0.05,
     outerRadius: 0.4,
     segments: 32

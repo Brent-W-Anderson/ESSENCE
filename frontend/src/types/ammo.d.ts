@@ -1,10 +1,9 @@
-// Types only; no runtime import.
-import type AmmoFactory from 'ammojs-typed'
+import type AmmoFactory from 'ammojs3'
+type AmmoModule = Awaited<ReturnType<AmmoFactory>>
 
-// Your backend-injected <script> defines window.Ammo = AmmoFactory
 declare global {
   interface Window {
-    Ammo: AmmoFactory;
+    Ammo: AmmoFactory | Promise<AmmoModule> | AmmoModule;
   }
 }
 

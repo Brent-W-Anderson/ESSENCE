@@ -1,4 +1,4 @@
-import { Component, onMount } from 'solid-js'
+import { Component, onCleanup, onMount } from 'solid-js'
 import {
     BoxGeometry,
     Group,
@@ -16,13 +16,12 @@ const Cube: Component<{
 }> = ( { index, scale, initialPosition } ) => {
     const {
         scene,
-        physicsWorld,
         createRigidBody,
         setObjectsRef
     } = useSceneContext()!
 
     const geometry = new BoxGeometry( scale.w, scale.h, scale.d )
-    const material = new MeshStandardMaterial( { color: 0x0000cc } )
+    const material = new MeshStandardMaterial( { color: 0x00aaff } )
     const cube = new Mesh( geometry, material )
 
     onMount( () => {
@@ -49,22 +48,15 @@ const Cube: Component<{
             height: scale.h / 2,
             depth: scale.d / 2
         } )
-        const world = physicsWorld?.()
 
-        if ( rigid && world ) {
-            world.addRigidBody( rigid )
-        }
-
-        return () => {
+        onCleanup( () => {
             if ( cube ) {
                 scene.remove( cube )
-                if ( rigid && world ) {
-                    world.removeRigidBody( rigid )
-                }
                 geometry.dispose()
                 material.dispose()
+                rigid.dispose()
             }
-        }
+        } )
     } )
 
     const helperGroup = new Group()

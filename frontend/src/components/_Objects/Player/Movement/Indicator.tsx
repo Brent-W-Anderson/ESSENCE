@@ -25,6 +25,8 @@ const PlayerMovementIndicator: Component = () => {
         opacity: 1
     } )
     const pointer = new Mesh( pointerGeometry, pointerMaterial )
+    pointerMaterial.dispose()
+    pointerGeometry.dispose()
     pointer.rotation.x = -Math.PI / 2
     pointer.visible = false
 

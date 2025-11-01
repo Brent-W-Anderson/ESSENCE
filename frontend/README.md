@@ -24,6 +24,8 @@
 
 #### $${\color{#9AA6B2} \text{BUG FIXES/TODOs}}$$
 
+##### &nbsp;&nbsp;&nbsp;&nbsp;🔹When switching between routes/pages, there seems to be a memory leak coming from initializeAmmo function inside the scene context when building the world again. When bypassing the world build, the player won't move, but the leak doesn't happen.
+
 ##### &nbsp;&nbsp;&nbsp;&nbsp;🔹When holding right-click to grab the screen while moving the character with W,A,S,D and going outside of the window before un-clicking will cause the character to keep moving in that direction until that key is pressed again. - solution - default W,A,S,D key state back to un-pressed, so the character stops moving when the mouse leaves the window.
 
 ##### &nbsp;&nbsp;&nbsp;&nbsp;🔹Only allow left-click on canvas to select a target location to move to.

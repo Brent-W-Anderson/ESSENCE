@@ -121,8 +121,9 @@ const Coordinates: Component<{
             )
         }
 
+        let rafId: number | null = null
         const animate = () => {
-            requestAnimationFrame( animate )
+            rafId = requestAnimationFrame( animate )
 
             const distance = camera().position.distanceTo( mesh.position )
             if ( ( hovered || alwaysVisible ) && distance <= 50 ) {
@@ -130,6 +131,7 @@ const Coordinates: Component<{
                 createOrUpdateTextSprite( updatedText, sprite )
                 updateSpritePosition()
                 helper.position.copy( mesh.position )
+                sprite.visible = true
             } else {
                 sprite.visible = false
             }
@@ -196,6 +198,16 @@ const Coordinates: Component<{
         }
 
         onCleanup( () => {
+            if ( rafId !== null ) {
+                cancelAnimationFrame( rafId )
+                rafId = null
+            }
+
+            // dispose GPU resources for the final sprite
+            const mat = sprite.material as SpriteMaterial
+            mat.map?.dispose()
+            mat.dispose()
+
             helper.remove( sprite )
             scene.remove( helper )
         } )

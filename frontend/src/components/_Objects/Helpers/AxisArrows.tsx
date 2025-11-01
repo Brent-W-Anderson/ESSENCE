@@ -105,16 +105,16 @@ const AxisArrows: Component<{
         // Set arrows visibility based on the alwaysVisible prop
         arrows.forEach( arrow => ( arrow.visible = alwaysVisible ) )
 
+        let rafId: number | null = null
         const animate = () => {
-            requestAnimationFrame( animate )
-
             const distance = camera().position.distanceTo( mesh.position )
             if ( ( hovered || alwaysVisible ) && distance <= 50 ) {
                 updateArrowsScale()
                 helper.position.copy( mesh.position )
             }
+            rafId = requestAnimationFrame( animate )
         }
-        animate()
+        rafId = requestAnimationFrame( animate )
 
         if ( !alwaysVisible ) {
             // Raycaster setup for mouse hover detection
@@ -154,10 +154,14 @@ const AxisArrows: Component<{
         }
 
         onCleanup( () => {
+            if ( rafId !== null ) cancelAnimationFrame( rafId )
             if ( showArrows ) {
-                helper.remove( arrowX )
-                helper.remove( arrowY )
-                helper.remove( arrowZ )
+                const parts = [arrowX, arrowY, arrowZ]
+                for ( const a of parts ) {
+                    a.cone.geometry.dispose()
+                    a.line.geometry.dispose()
+                    helper.remove( a )
+                }
             }
             scene.remove( helper )
         } )

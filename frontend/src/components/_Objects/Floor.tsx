@@ -1,4 +1,4 @@
-import { Component, onMount } from 'solid-js'
+import { Component, onCleanup, onMount } from 'solid-js'
 import { BoxGeometry, Mesh, MeshStandardMaterial, PlaneGeometry } from 'three'
 import { useSceneContext } from '@/components/_Scene/Context'
 
@@ -8,9 +8,9 @@ const Floor: Component = () => {
     let floor: Mesh | null = null
 
     onMount( () => {
-        const floorGeometry = new PlaneGeometry( 1000, 1000 )
+        const floorGeometry = new PlaneGeometry( 100, 100 )
         const floorMaterial = new MeshStandardMaterial( {
-            color: 0xcccccc
+            color: 0x00ffff
         } )
 
         floor = new Mesh( floorGeometry, floorMaterial )
@@ -22,8 +22,8 @@ const Floor: Component = () => {
         setFloorRef?.( floor )
 
         const rigid = createRigidBody( floor, 0, {
-            width: 500,
-            height: 500,
+            width: 50,
+            height: 50,
             depth: 0
         } )
         const world = physicsWorld?.()
@@ -42,7 +42,7 @@ const Floor: Component = () => {
         ) => {
             const wallGeometry = new BoxGeometry( width, height, depth )
             const wallMaterial = new MeshStandardMaterial( {
-                color: 0x333333
+                color: 0x00aaff
             } )
 
             const wall = new Mesh( wallGeometry, wallMaterial )
@@ -57,20 +57,19 @@ const Floor: Component = () => {
                 depth: depth / 2
             } )
 
-            if ( wallRigid && world ) {
-                world.addRigidBody( wallRigid )
+            return {
+                wall,
+                wallRigid
             }
-
-            return wall
         }
 
         const wallHeight = 2
         const wallThickness = 1
-        const halfSize = 500 - wallThickness / 2
+        const halfSize = 50 - wallThickness / 2
 
         const walls = [
             createWall(
-                1000,
+                100,
                 wallHeight,
                 wallThickness,
                 0,
@@ -78,7 +77,7 @@ const Floor: Component = () => {
                 halfSize
             ), // Front wall
             createWall(
-                1000,
+                100,
                 wallHeight,
                 wallThickness,
                 0,
@@ -88,7 +87,7 @@ const Floor: Component = () => {
             createWall(
                 wallThickness,
                 wallHeight,
-                1000,
+                100,
                 halfSize,
                 wallHeight / 2,
                 0
@@ -96,29 +95,30 @@ const Floor: Component = () => {
             createWall(
                 wallThickness,
                 wallHeight,
-                1000,
+                100,
                 -halfSize,
                 wallHeight / 2,
                 0
             ) // Left wall
         ]
 
-        return () => {
+        onCleanup( () => {
+            // floor
             if ( floor ) {
                 scene.remove( floor )
-
-                if ( rigid && world ) {
-                    world.removeRigidBody( rigid )
-                }
+                floorGeometry.dispose()
+                floorMaterial.dispose()
+                rigid.dispose()
             }
+
+            // walls
             walls.forEach( wall => {
-                scene.remove( wall )
-                const wallRigid = wall.userData.physicsBody
-                if ( wallRigid && world ) {
-                    world.removeRigidBody( wallRigid )
-                }
+                scene.remove( wall.wall )
+                wall.wall.geometry.dispose()
+                wall.wall.material.dispose()
+                wall.wallRigid.dispose()
             } )
-        }
+        } )
     } )
 
     return null

@@ -1,5 +1,6 @@
 const ROUTE = {
-    HOME: '/'
+    HOME: '/',
+    GAME: '/game'
 }
 
 export default ROUTE

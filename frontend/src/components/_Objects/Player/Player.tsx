@@ -1,4 +1,4 @@
-import { Component, onMount } from 'solid-js'
+import { Component, onCleanup, onMount } from 'solid-js'
 import {
     CapsuleGeometry,
     Group,
@@ -19,7 +19,6 @@ const Player: Component<{
 } ) => {
     const {
         scene,
-        physicsWorld,
         createRigidBody,
         updateMesh,
         AmmoLib,
@@ -34,7 +33,7 @@ const Player: Component<{
         const height = 4
 
         const geometry = new CapsuleGeometry( radius, height, 40, 40 )
-        const material = new MeshStandardMaterial( { color: 0x00ff00 } )
+        const material = new MeshStandardMaterial( { color: 0x7700ff } )
         const player = new Mesh( geometry, material )
 
         player.castShadow = true
@@ -56,19 +55,14 @@ const Player: Component<{
         }
 
         const ammoHeight = calcAmmoHeight( height )
-        const body = createRigidBody( group, 1, {
+        const rigid = createRigidBody( group, 1, {
             width: radius,
             height: ammoHeight,
             depth: radius
         } )
+        const body = rigid.body
 
-        const world = physicsWorld?.()
         const ammo = AmmoLib()
-
-        if ( body && world ) {
-            world.addRigidBody( body )
-        }
-
         if ( ammo && body ) {
             const zero = new ammo.btVector3( 0, 0, 0 )
             body.setAngularFactor( zero )
@@ -84,16 +78,13 @@ const Player: Component<{
 
         setPlayerRef!( group )
 
-        return () => {
+        onCleanup( () => {
             scene.remove( group )
 
-            if ( body && world  ) {
-                world.removeRigidBody( body )
-            }
-
+            rigid.dispose()
             geometry.dispose()
             material.dispose()
-        }
+        } )
     } )
 
     const helperGroup = new Group()

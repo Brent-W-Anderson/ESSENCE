@@ -1,4 +1,4 @@
-import { Component, onCleanup } from 'solid-js'
+import { Component, onCleanup, onMount } from 'solid-js'
 import { Box3, Mesh, Raycaster, Vector2 } from 'three'
 import { usePlayerMovementContext } from './Context'
 import { useSceneContext } from '@/components/_Scene/Context'
@@ -104,17 +104,24 @@ export const MouseHandlers: Component = () => {
         }
     }
 
-    document.addEventListener( 'mousedown', e => onMouseDown( e ) )
-    document.addEventListener( 'mouseup', e => onMouseUp( e ) )
-    document.addEventListener( 'mousemove', e => updateMousePosition( e ) )
+    const handleMouseDown = ( e: MouseEvent ) => onMouseDown( e )
+    const handleMouseUp   = ( e: MouseEvent ) => onMouseUp( e )
+    const handleMouseMove = ( e: MouseEvent ) => updateMousePosition( e )
+
+    onMount( () => {
+        document.addEventListener( 'mousedown', handleMouseDown )
+        document.addEventListener( 'mouseup', handleMouseUp )
+        document.addEventListener( 'mousemove', handleMouseMove )
+    } )
 
     onCleanup( () => {
-        document.removeEventListener( 'mousedown', e => onMouseDown( e ) )
-        document.removeEventListener( 'mouseup', e => onMouseUp( e ) )
-        document.removeEventListener( 'mousemove', e => updateMousePosition( e ) )
+        document.removeEventListener( 'mousedown', handleMouseDown )
+        document.removeEventListener( 'mouseup', handleMouseUp )
+        document.removeEventListener( 'mousemove', handleMouseMove )
 
         if ( intervalIdRef.current !== null ) {
             clearInterval( intervalIdRef.current )
+            intervalIdRef.current = null
         }
     } )
 

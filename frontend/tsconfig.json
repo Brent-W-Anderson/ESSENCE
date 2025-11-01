@@ -13,7 +13,6 @@
             ],
             "@/*": ["./src/*"]
         },
-        "types": ["ammojs-typed"],
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
